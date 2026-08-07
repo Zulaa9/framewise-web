@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Vercel needs no config file — it detects Astro and uses dist/ automatically.
+# This file only matters if you deploy to Netlify.

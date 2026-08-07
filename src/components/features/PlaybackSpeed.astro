@@ -1,0 +1,170 @@
+---
+import FeatureHeading from './FeatureHeading.astro';
+import DemoVideo from '../DemoVideo.astro';
+import type { TranslationKey } from '../../i18n/ui';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const stats: {
+  label: TranslationKey;
+  value: TranslationKey;
+  caption: TranslationKey;
+}[] = [
+  {
+    label: 'f2.stat1.label',
+    value: 'f2.stat1.value',
+    caption: 'f2.stat1.caption',
+  },
+  {
+    label: 'f2.stat2.label',
+    value: 'f2.stat2.value',
+    caption: 'f2.stat2.caption',
+  },
+];
+
+/**
+ * Presets shown as the interactive demo. Kept inside the product's own default
+ * range (0.25×–4×, see the stat panel) rather than reaching toward the
+ * unlimited configurable ceiling — past a few ×, the source clip is just an
+ * unwatchable blur regardless of how good the tool is, so it wouldn't
+ * demonstrate anything. The ×∞ claim stays a copy claim, not something the
+ * demo itself needs to literally offer.
+ */
+const presets = [0.25, 0.5, 1, 2, 4];
+---
+
+<!--
+  02 — copy left, media right. Stacks below lg.
+
+  Real playbackRate control on a real <video> — dragging/clicking a preset
+  changes the actual speed live, no simulation. The ~133s drone shot over wind
+  turbines (see public/media/LICENSE.md) is the fourth source tried for this
+  section — rain droplets, river rapids, and campfire flames were all tried and
+  dropped first, the full story is in the LICENSE note. This one was picked by
+  eye, not by the frame-diff measurement used to screen the others: it actually
+  scores the lowest of everything tried (a slow, smooth drone orbit barely
+  changes frame-to-frame within any single second), which is exactly why it's
+  worth flagging here — if this section ever feels static rather than dynamic
+  again, this is the reason, and reverting to the campfire clip is a one-line
+  change away.
+-->
+<section
+  aria-labelledby="f2-title"
+  class="mx-auto grid max-w-page items-center gap-12 px-6 lg:grid-cols-[4.5fr_7.5fr] lg:gap-[8%]"
+>
+  <div>
+    <FeatureHeading
+      number="02"
+      id="f2-title"
+      label="f2.label"
+      title="f2.title"
+      body="f2.body"
+      align="start"
+      bodyClass="max-w-[24rem]"
+    />
+
+    <dl class="mt-11 flex flex-col gap-7">
+      {
+        stats.map((stat) => (
+          <div>
+            <dt class="font-mono text-label tracking-chip text-ink-faint">
+              {t(stat.label)}
+            </dt>
+            <dd class="mt-1.5 font-mono text-stat font-semibold leading-none tracking-heading">
+              {t(stat.value)}
+            </dd>
+            <dd class="mt-1.5 text-xs text-ink-faint">{t(stat.caption)}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+
+  <div data-speed-demo>
+    <figure class="relative overflow-hidden rounded-media-sm border border-line">
+      <DemoVideo
+        src="/media/wind-turbines.mp4"
+        type="video/mp4"
+        label={t('f2.video.label')}
+        heightClass="h-[31.25rem] min-h-64"
+      >
+        <!-- Live speed readout, bottom-left as in the design. -->
+        <p
+          data-speed-readout
+          class="pointer-events-none absolute bottom-5 left-5 rounded-chip border border-line-strong bg-chip px-3 py-1.5 font-mono text-xs tabular-nums"
+          aria-hidden="true"
+        >
+          1×
+        </p>
+      </DemoVideo>
+    </figure>
+
+    <!-- Preset pill, same segmented-control language as the language toggle
+         in the header — filled active segment, ghost inactive ones. -->
+    <div
+      role="group"
+      aria-label={t('f2.speedGroup')}
+      class="mt-6 flex items-center justify-center gap-1 rounded-pill border border-line-compare bg-fill-subtle p-1.5 font-mono text-sm"
+    >
+      {
+        presets.map((rate) => (
+          <button
+            type="button"
+            data-speed-preset={rate}
+            aria-pressed={rate === 1 ? 'true' : 'false'}
+            class:list={[
+              'flex-1 rounded-pill px-3 py-2 transition-colors duration-150',
+              rate === 1
+                ? 'bg-ink font-medium text-bg'
+                : 'text-ink-faint hover:text-ink',
+            ]}
+          >
+            {rate}×
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-speed-demo]').forEach((root) => {
+    const video = root.querySelector<HTMLVideoElement>('[data-demo-video]');
+    const readout = root.querySelector<HTMLElement>('[data-speed-readout]');
+    const buttons = [
+      ...root.querySelectorAll<HTMLButtonElement>('[data-speed-preset]'),
+    ];
+    if (!video || !readout || buttons.length === 0) return;
+
+    const activeClasses = ['bg-ink', 'font-medium', 'text-bg'];
+    const inactiveClasses = ['text-ink-faint'];
+
+    const setRate = (rate: number) => {
+      // playbackRate is independent of paused/currentTime — safe to set at
+      // any time, including before the video has started playing at all.
+      video.playbackRate = rate;
+      readout.textContent = `${rate}×`;
+
+      for (const button of buttons) {
+        const isActive = Number(button.dataset.speedPreset) === rate;
+        button.setAttribute('aria-pressed', String(isActive));
+        button.classList.toggle('bg-ink', isActive);
+        button.classList.toggle('font-medium', isActive);
+        button.classList.toggle('text-bg', isActive);
+        button.classList.toggle('text-ink-faint', !isActive);
+      }
+    };
+
+    for (const button of buttons) {
+      const rate = Number(button.dataset.speedPreset);
+      button.addEventListener('click', () => setRate(rate));
+    }
+
+    // The clip loops (`loop` on the element, see DemoVideo.astro); looping
+    // preserves playbackRate across the restart in every browser this product
+    // targets, so no extra wiring is needed to keep a chosen speed applied
+    // after the loop point.
+  });
+</script>

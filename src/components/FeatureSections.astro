@@ -1,0 +1,45 @@
+---
+import FrameNavigation from './features/FrameNavigation.astro';
+import PlaybackSpeed from './features/PlaybackSpeed.astro';
+import FloatingControls from './features/FloatingControls.astro';
+import ScreenshotCapture from './features/ScreenshotCapture.astro';
+import VolumeAmplification from './features/VolumeAmplification.astro';
+---
+
+<!--
+  The five numbered feature blocks. Each owns its own <section> and heading; this
+  wrapper only supplies the vertical rhythm between them (220px in the design,
+  collapsing to 96px on mobile via --spacing-feature).
+
+  Top padding uses the smaller --spacing-feature-top instead of
+  --spacing-feature: sharing one token meant the whitespace above block 01
+  always equalled a full inter-feature gap, which read as too much — the
+  edge of the block isn't the same kind of pause as the beat between two
+  features. Bottom padding is untouched (still --spacing-feature via
+  pb-feature) — the space below 05 wasn't flagged as a problem.
+
+  scroll-margin-top is NOT the usual +4.75rem (matches the fixed header)
+  every other anchor target uses. Landing at that offset put the viewport's
+  top edge inside this wrapper's own --spacing-feature-top padding, above
+  block 01 rather than at it — clicking "Features" in the section rail
+  scrolled to a stretch of empty space, with 01 itself starting well below
+  the header-clearance line everywhere else lands flush. Subtracting that
+  same padding back out of the offset (`calc(4.75rem - var(--spacing-
+  feature-top))`, rather than a fixed px guess) makes the landing skip
+  exactly that padding at any viewport width, so 01 lands at the same
+  clearance as every other section — and, since ScrollProgress.astro reads
+  this same computed scroll-margin-top to work out where a segment's fill
+  should read 0%, the rail still shows "Features" starting from empty the
+  instant this lands, with no separate fix needed there.
+-->
+<div
+  id="features"
+  data-section="features"
+  class="flex scroll-mt-[calc(4.75rem-var(--spacing-feature-top))] flex-col gap-feature pt-feature-top pb-feature"
+>
+  <FrameNavigation />
+  <PlaybackSpeed />
+  <FloatingControls />
+  <ScreenshotCapture />
+  <VolumeAmplification />
+</div>

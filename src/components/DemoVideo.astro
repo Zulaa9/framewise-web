@@ -1,0 +1,188 @@
+---
+/**
+ * Shared base for every feature demo that plays a real <video> (01 frame
+ * navigation, 02 playback speed, 03 floating controls, 04 screenshot capture —
+ * 05's audio-focused demo reuses the same element, different controls).
+ *
+ * Handles the two concerns common to all of them, so each feature's own script
+ * only has to wire up its own buttons:
+ *
+ *  - Muted autoplay, paused again once scrolled well out of view to save
+ *    battery/bandwidth on a page with several of these.
+ *  - `prefers-reduced-motion`: never autoplay. The element loads paused on its
+ *    first frame; starting it becomes the feature's own play button, an
+ *    explicit user action rather than something sprung on them.
+ *
+ * Autoplay is attempted directly, not gated behind IntersectionObserver firing
+ * first — confirmed directly on this page, not assumed, that IO does not
+ * reliably fire here, which meant the video never played at all rather than
+ * just missing the lazy-start optimisation. IO is still used, but only for the
+ * pause-when-scrolled-away side: if it never fires there either, the failure
+ * mode is "plays a bit longer than ideal", not "never plays" — the same
+ * dual-mechanism precedent as the header's scroll listener and the section
+ * rail's remeasure logic elsewhere in this codebase.
+ *
+ * A feature's own controls signal intent via `data-wants-paused` — "true" once
+ * the visitor pauses (or steps a frame) through its own buttons, cleared back
+ * to "false" if they press play again. This is deliberately an intent flag,
+ * not a one-way "has this been touched at all" latch: an earlier version used
+ * the latter and it meant that once *any* interaction had happened, a later
+ * spontaneous pause (see below) could never be recovered from again, and
+ * scrolling away no longer paused it either — both real bugs, not
+ * hypothetical. Re-pressing play must restore full normal behaviour, not just
+ * resume once.
+ */
+interface Props {
+  /**
+   * WebM (VP9) only — verified in the browser, not assumed. An .ogv/Theora
+   * source was tried first for one of these demos and silently failed: audio
+   * played, `currentTime` advanced, `readyState` reached HAVE_ENOUGH_DATA, but
+   * `videoWidth`/`videoHeight` stayed 0 forever — `canPlayType('video/ogg;
+   * codecs="theora"')` returns `""`. Current Chrome and Edge, the two browsers
+   * this product actually targets, have dropped the Theora video decoder while
+   * keeping Vorbis audio, which is exactly the failure this produces: nothing
+   * in the console, nothing in the network tab, just a permanently blank frame.
+   */
+  src: string;
+  /** MIME type for the <source> — "video/webm" for every file used so far. */
+  type: string;
+  /** Accessible name for the video region — what it shows, not that it's a video. */
+  label: string;
+  heightClass?: string;
+  class?: string;
+}
+
+const {
+  src,
+  type,
+  label,
+  heightClass = 'h-[min(720px,56vw)] min-h-64',
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={['relative overflow-hidden', heightClass, className]}
+  role="group"
+  aria-label={label}
+>
+  <!--
+    preload="auto", not "metadata": these clips are small (2-5MB) and this is
+    the difference between a visible first frame while the visitor scrolls
+    toward the section and a black rectangle until playback actually starts —
+    "metadata" only guarantees dimensions/duration, not a decoded, paintable
+    frame.
+  -->
+  <video
+    data-demo-video
+    muted
+    loop
+    playsinline
+    preload="auto"
+    class="h-full w-full object-cover"
+  >
+    <source src={src} type={type} />
+  </video>
+
+  <slot />
+</div>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document
+    .querySelectorAll<HTMLVideoElement>('[data-demo-video]')
+    .forEach((video) => {
+      if (video.dataset.baseWired) return;
+      video.dataset.baseWired = 'true';
+
+      // Visibility by direct geometry, not IntersectionObserver — confirmed
+      // directly on this page that IO does not reliably fire here, which
+      // previously meant the video never started at all rather than just
+      // missing the "only play while visible" optimisation. getBoundingClientRect
+      // is a synchronous read with no callback to fail to arrive, so this
+      // drives both starting AND stopping playback, no observer involved.
+      const isNearViewport = () => {
+        const rect = video.getBoundingClientRect();
+        if (rect.height <= 0) return false;
+        const visibleTop = Math.max(rect.top, 0);
+        const visibleBottom = Math.min(rect.bottom, window.innerHeight);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+        return visibleHeight / rect.height >= 0.3; // same 30% threshold as before
+      };
+
+      // In Picture-in-Picture, the element's own on-page position is
+      // irrelevant to whether it should keep playing — the whole point of
+      // "float the video and keep working around it" (feature 03) is that
+      // scrolling its original spot out of view must NOT pause it. Without
+      // this check, popping a video out and then scrolling away would kill
+      // the exact thing the visitor just asked to keep watching.
+      const isInPictureInPicture = () =>
+        document.pictureInPictureElement === video;
+
+      // Single source of truth, checked both proactively (syncPlayback, on
+      // scroll/resize/visibility signals) and reactively (the 'pause'
+      // recovery listener below) — a video should be playing right now if and
+      // only if these hold.
+      const shouldBePlaying = () =>
+        video.dataset.wantsPaused !== 'true' &&
+        !reduceMotion.matches &&
+        (isNearViewport() || isInPictureInPicture());
+
+      const syncPlayback = () => {
+        const should = shouldBePlaying();
+        if (should && video.paused) {
+          video.play().catch(() => {
+            // Autoplay can still be refused (e.g. data-saver mode); the video
+            // just sits on its poster frame, which is a fine fallback state.
+          });
+        } else if (!should && !video.paused) {
+          // Flagged so the 'pause' listener below can tell this pause apart
+          // from one neither it nor a user asked for.
+          video.dataset.pausingForVisibility = 'true';
+          video.pause();
+        }
+      };
+
+      syncPlayback();
+      video.addEventListener('loadeddata', syncPlayback, { once: true });
+      window.addEventListener('scroll', syncPlayback, { passive: true });
+      window.addEventListener('resize', syncPlayback);
+      new IntersectionObserver(syncPlayback, { threshold: 0.3 }).observe(video);
+
+      // Re-evaluate right at the moment PiP starts or ends, rather than
+      // waiting for an unrelated scroll/resize to happen to fire next.
+      // Closing the floating window while the page is scrolled away from the
+      // video's original spot should pause it immediately, not whenever the
+      // visitor next happens to scroll.
+      video.addEventListener('enterpictureinpicture', syncPlayback);
+      video.addEventListener('leavepictureinpicture', syncPlayback);
+
+      // Recovers from a pause nothing in this file asked for. Confirmed this
+      // is a real, reproducible failure mode, not a defensive guess: a
+      // scripted playthrough with no interaction at all paused itself ~5s
+      // into a ~7s looping clip, firing a genuine 'pause' event with no
+      // matching call anywhere in this codebase — most likely the browser's
+      // own policy of pausing media it considers backgrounded/not visible,
+      // since this project's dev tooling has shown the same pattern on
+      // several other compositor-tied APIs (ResizeObserver, IntersectionObserver,
+      // requestVideoFrameCallback all failed to fire in the same environment).
+      // `loop` reaching its natural end would also produce a plain 'pause'
+      // here if it ever stalled instead of seeking back to 0, so this single
+      // handler covers both cases rather than needing a separate 'ended' one.
+      //
+      // Checking shouldBePlaying() again here, rather than reusing whatever
+      // `should` was computed at the call site, is what makes resuming after
+      // a manual pause work correctly: once the visitor presses play again,
+      // wantsPaused flips back to "false", so this listener starts recovering
+      // spontaneous pauses again too — not just once, permanently.
+      video.addEventListener('pause', () => {
+        const wasIntentional = video.dataset.pausingForVisibility === 'true';
+        delete video.dataset.pausingForVisibility;
+        if (wasIntentional) return; // syncPlayback's own out-of-view pause
+        if (!shouldBePlaying()) return; // a real user pause, reduced motion, or off-screen
+        if (video.currentTime >= video.duration - 0.05) video.currentTime = 0;
+        video.play().catch(() => {});
+      });
+    });
+</script>

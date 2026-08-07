@@ -1,0 +1,314 @@
+---
+import FeatureHeading from './FeatureHeading.astro';
+import DemoVideo from '../DemoVideo.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+/**
+ * Preset steps, in percent. 0 is the real starting state (see script below —
+ * the video plays muted until a preset is picked, matching the product's own
+ * "silent by default" behaviour), 300 mirrors the stat panel's default
+ * ceiling. Values beyond that need the custom field.
+ */
+const presets = [0, 50, 100, 150, 200, 250, 300];
+
+/**
+ * Upper bound for the custom field. The extension itself has no hard ceiling
+ * (see the ×∞ claim in the copy), but a live demo does need *some* limit —
+ * past ~1000% a Web Audio GainNode mostly produces clipping distortion
+ * rather than anything that reads as "louder", so there's nothing left to
+ * usefully demonstrate above it. Purely a demo-safety bound, not a product
+ * claim.
+ */
+const customMax = 1000;
+---
+
+<!--
+  05 — full-width media with a real preset scale beneath.
+
+  Real amplification, not simulated: a Web Audio GainNode is wired in and
+  driven live from the preset/custom controls, sourced directly from THIS
+  video's own audio track via createMediaElementSource(video) — not a
+  separately paired track. Native <video> volume caps at 1.0 (100%), which
+  is exactly the ceiling this feature exists to blow past.
+
+  Getting here took a wrong turn worth recording: stock b-roll is nearly
+  always delivered without usable audio — of 60+ candidate clips tried
+  across Pexels and Mixkit (DJ gear, guitar, podcast footage, vlogging,
+  concert crowds — each checked with a live Web Audio AnalyserNode, not file
+  metadata), only two had any real signal at all, and neither fit ("harsh
+  water noise" and "faint crowd murmur"). That led to briefly shipping a
+  silent visual paired with a separately-sourced music track, which a
+  listener correctly rejected too: a 3D-rendered visual and a generic
+  "lo-fi" track playing over it, but not actually the same sound as the
+  video — not what "amplify the video's volume" should mean. Widening the
+  search to Pixabay found this clip, which has its own real, audible piano
+  recording baked in — see public/media/LICENSE.md for the full trail.
+
+  Media height caps at `100svh - 39rem`, not just 560px/46vw — this block
+  carries more chrome below the video than any other feature (preset pills,
+  the custom-amount field, the stat line), so it was the tallest section on
+  the page and needed a second scroll to see in full on an ordinary laptop
+  screen. 39rem is that non-video chrome's own height at the width this was
+  measured against, so video + everything below it settles just under one
+  viewport tall on typical screens, matching every other feature block.
+-->
+<section aria-labelledby="f5-title">
+  <FeatureHeading
+    number="05"
+    id="f5-title"
+    label="f5.label"
+    title="f5.title"
+    body="f5.body"
+    size="lg"
+    class="mx-auto max-w-copy px-6"
+  />
+
+  <div data-volume-demo class="mx-auto mt-12 max-w-wide px-6 md:mt-14">
+    <figure
+      class="relative overflow-hidden rounded-media border border-line shadow-volume"
+    >
+      <DemoVideo
+        src="/media/piano-greensleeves.mp4"
+        type="video/mp4"
+        label={t('f5.video.label')}
+        heightClass="h-[min(calc(100svh-39rem),560px,46vw)] min-h-56"
+      >
+        <!-- Live level meter, bottom edge — reflects the actual GainNode
+             output via an AnalyserNode, not a canned animation. Decorative:
+             the percent readout is the accessible source of truth. -->
+        <div
+          class="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-fill-ghost/40"
+          aria-hidden="true"
+        >
+          <div
+            data-volume-meter
+            class="h-full w-0 origin-left bg-accent transition-[width] duration-75 ease-out"
+          >
+          </div>
+        </div>
+
+        <!-- Live percent readout, bottom-left, same chip language as the
+             speed readout in feature 02. -->
+        <p
+          data-volume-readout
+          role="status"
+          aria-live="polite"
+          class="pointer-events-none absolute bottom-5 left-5 rounded-chip border border-line-strong bg-chip px-3 py-1.5 font-mono text-xs tabular-nums"
+        >
+          0%
+        </p>
+      </DemoVideo>
+    </figure>
+
+    <!-- Preset pill, same segmented-control language as playback speed. -->
+    <div class="mt-9 flex flex-col items-center gap-4">
+      <div
+        role="group"
+        aria-label={t('f5.presetGroup')}
+        class="flex flex-wrap items-center justify-center gap-1 rounded-pill border border-line-compare bg-fill-subtle p-1.5 font-mono text-xs sm:text-sm"
+      >
+        {
+          presets.map((value) => (
+            <button
+              type="button"
+              data-volume-preset={value}
+              aria-pressed={value === 0 ? 'true' : 'false'}
+              class:list={[
+                'rounded-pill px-3 py-2 transition-colors duration-150 sm:px-4',
+                value === 0
+                  ? 'bg-ink font-medium text-bg'
+                  : 'text-ink-faint hover:text-ink',
+              ]}
+            >
+              {value}%
+            </button>
+          ))
+        }
+      </div>
+
+      <!-- Custom field — the only way past the 300% preset ceiling. -->
+      <form
+        data-volume-custom-form
+        class="flex items-center gap-2 font-mono text-xs sm:text-sm"
+      >
+        <label
+          for="f5-custom-input"
+          class="text-ink-faint"
+        >
+          {t('f5.custom.label')}
+        </label>
+        <input
+          id="f5-custom-input"
+          data-volume-custom-input
+          type="number"
+          inputmode="numeric"
+          min="0"
+          max={customMax}
+          step="1"
+          placeholder={t('f5.custom.placeholder')}
+          class="w-20 rounded-btn border border-line-compare bg-fill-subtle px-2.5 py-2 text-center tabular-nums text-ink outline-none focus-visible:border-line-hover"
+        />
+        <button
+          type="submit"
+          class="rounded-btn border border-line-strong px-3 py-2 font-medium transition-colors duration-150 hover:border-line-hover"
+        >
+          {t('f5.custom.apply')}
+        </button>
+      </form>
+    </div>
+
+    <p class="mt-11 text-center">
+      <span
+        class="block font-mono text-stat-lg font-semibold leading-none tracking-heading"
+        >{t('f5.stat.value')}</span
+      >
+      <span class="mt-2.5 block text-sm text-ink-faint"
+        >{t('f5.stat.caption')}</span
+      >
+    </p>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-volume-demo]').forEach((root) => {
+    const video = root.querySelector<HTMLVideoElement>('[data-demo-video]');
+    const readout = root.querySelector<HTMLElement>('[data-volume-readout]');
+    const meter = root.querySelector<HTMLElement>('[data-volume-meter]');
+    const presetButtons = [
+      ...root.querySelectorAll<HTMLButtonElement>('[data-volume-preset]'),
+    ];
+    const customForm = root.querySelector<HTMLFormElement>(
+      '[data-volume-custom-form]',
+    );
+    const customInput = root.querySelector<HTMLInputElement>(
+      '[data-volume-custom-input]',
+    );
+    if (
+      !video || !readout || !meter || !customForm || !customInput ||
+      presetButtons.length === 0
+    ) {
+      return;
+    }
+
+    const CUSTOM_MAX = Number(customInput.max) || 1000;
+
+    // The video's own native volume is deliberately kept well under 1.0 as a
+    // base level, not just the GainNode's 0-1 default — otherwise "100%" (the
+    // source recording's own, unboosted level) already plays at a fairly
+    // assertive volume, and 300%+ on top of that turns genuinely ear-hurting
+    // rather than just "clearly louder". Confirmed empirically (not assumed)
+    // that HTMLMediaElement.volume still attenuates the signal even once
+    // routed through a MediaElementSourceNode — it acts as a pre-gain ahead
+    // of the Web Audio graph, so scaling it down here buys real headroom for
+    // the high end of the percent range without touching the gain math
+    // itself (100% preset still literally means gain = 1).
+    const BASE_VOLUME = 0.35;
+
+    // The audio graph is built up front — creating an AudioContext and a
+    // MediaElementSourceNode doesn't itself need a user gesture, and
+    // createMediaElementSource() can only ever be called once per element,
+    // so this can't be deferred to the first click without risking a second,
+    // throwing call if two interactions raced. What DOES need a gesture is
+    // resuming a suspended context and unmuting the video — both held off
+    // until the first real interaction below, so the video keeps autoplaying
+    // muted exactly like every other demo on this page until the visitor
+    // actually engages this one.
+    let ctx: AudioContext | null = null;
+    let gainNode: GainNode | null = null;
+    let analyser: AnalyserNode | null = null;
+    let meterIntervalId: number | undefined;
+
+    const ensureGraph = () => {
+      if (ctx) return;
+      const AudioContextCtor =
+        window.AudioContext ||
+        (window as typeof window & { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
+      if (!AudioContextCtor) return; // no Web Audio support — presets no-op gracefully
+      ctx = new AudioContextCtor();
+      const source = ctx.createMediaElementSource(video);
+      gainNode = ctx.createGain();
+      gainNode.gain.value = 0;
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(gainNode);
+      gainNode.connect(analyser);
+      analyser.connect(ctx.destination);
+    };
+
+    const meterData = () => {
+      if (!analyser) return null;
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteTimeDomainData(data);
+      return data;
+    };
+
+    // A plain timer, not requestAnimationFrame: confirmed directly in this
+    // project's dev environment that rAF (like ResizeObserver,
+    // IntersectionObserver and requestVideoFrameCallback before it) doesn't
+    // reliably fire here — the audio graph itself measured a real signal via
+    // a one-off analyser read while the meter driven by rAF stayed frozen at
+    // 0%. setInterval is the same mechanism already relied on for the clip
+    // recording timer (feature 04) and fires consistently.
+    const tickMeter = () => {
+      const data = meterData();
+      if (!data) return;
+      let peak = 0;
+      for (const value of data) peak = Math.max(peak, Math.abs(value - 128));
+      // 0-127 range from a mid-128 waveform -> 0-100% fill, generously
+      // scaled (×1.6) so moderate amplification actually reads as visible
+      // movement rather than a sliver.
+      const pct = Math.min(100, (peak / 128) * 160);
+      meter.style.width = `${pct}%`;
+    };
+
+    // Engages the graph on first real use: resumes the (until-now suspended)
+    // AudioContext and unmutes the video, both inside a synchronous gesture
+    // handler as most browsers require. Safe to call repeatedly — resume()/
+    // muted=false are no-ops once already active.
+    const engage = () => {
+      ensureGraph();
+      if (!ctx) return;
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+      video.muted = false;
+      video.volume = BASE_VOLUME;
+      if (meterIntervalId === undefined) {
+        meterIntervalId = window.setInterval(tickMeter, 100);
+      }
+    };
+
+    const applyPercent = (percent: number) => {
+      const clamped = Math.max(0, Math.min(CUSTOM_MAX, percent));
+      engage();
+      if (gainNode) gainNode.gain.value = clamped / 100;
+      readout.textContent = `${Math.round(clamped)}%`;
+
+      for (const button of presetButtons) {
+        const isActive = Number(button.dataset.volumePreset) === clamped;
+        button.setAttribute('aria-pressed', String(isActive));
+        button.classList.toggle('bg-ink', isActive);
+        button.classList.toggle('font-medium', isActive);
+        button.classList.toggle('text-bg', isActive);
+        button.classList.toggle('text-ink-faint', !isActive);
+      }
+    };
+
+    for (const button of presetButtons) {
+      const value = Number(button.dataset.volumePreset);
+      button.addEventListener('click', () => {
+        applyPercent(value);
+        customInput.value = '';
+      });
+    }
+
+    customForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const value = Number(customInput.value);
+      if (!Number.isFinite(value) || customInput.value.trim() === '') return;
+      applyPercent(value);
+    });
+  });
+</script>

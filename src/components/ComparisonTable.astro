@@ -1,0 +1,131 @@
+---
+import BandEdges from './BandEdges.astro';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import type { TranslationKey } from '../i18n/ui';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const rows: { without: TranslationKey; with: TranslationKey }[] = [
+  { without: 'compare.row1.without', with: 'compare.row1.with' },
+  { without: 'compare.row2.without', with: 'compare.row2.with' },
+  { without: 'compare.row3.without', with: 'compare.row3.with' },
+];
+---
+
+<section
+  id="problem"
+  data-section="problem"
+  aria-labelledby="compare-heading"
+  class="relative scroll-mt-19 bg-surface px-6 py-band"
+>
+  <!--
+    Bottom edge only. The top edge now butts directly against the hero demo
+    band's closing rule, and a gradient starting right below a hard line reads
+    as a smudge rather than a transition. It would also fade from the page
+    background, which is not the colour sitting above it any more.
+  -->
+  <BandEdges edges="bottom" />
+
+  <div class="relative mx-auto max-w-compare">
+    <h2
+      id="compare-heading"
+      class="text-center font-mono text-label font-medium tracking-eyebrow text-ink-faint uppercase"
+    >
+      {t('compare.eyebrow')}
+    </h2>
+
+    <!--
+      Mobile: each row is a self-contained before/after card, so the two halves
+      stay paired. Desktop (md+): every <li> becomes `display: contents`, which
+      drops the card box and lets its two cells flow straight into the parent
+      2-column grid — recreating the design's table without duplicating markup.
+    -->
+    <div
+      class="relative mt-14 grid gap-y-4 md:mt-18 md:grid-cols-2 md:gap-x-16 md:gap-y-0"
+    >
+      <!-- Column divider. Accent-tinted and fading at both ends: this is the
+           line that separates "before" from "after", so it carries the accent
+           rather than being another neutral hairline. -->
+      <div
+        class="pointer-events-none absolute inset-y-0 left-1/2 hidden w-px bg-linear-to-b from-transparent via-accent/45 to-transparent md:block"
+        aria-hidden="true"
+      >
+      </div>
+
+      <!-- Column headers: desktop only. On mobile each card labels itself. -->
+      <div class="hidden items-center gap-2.5 border-b border-line pb-6 md:flex">
+        <span class="size-1.5 rounded-full bg-ink-subtle" aria-hidden="true"
+        ></span>
+        <h3
+          class="font-mono text-label font-medium tracking-label text-ink-faint uppercase"
+        >
+          {t('compare.without')}
+        </h3>
+      </div>
+      <div
+        class="hidden items-center gap-2.5 border-b border-line pb-6 md:flex md:pl-11"
+      >
+        <span class="size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+        <h3
+          class="font-mono text-label font-medium tracking-label text-ink uppercase"
+        >
+          {t('compare.with')}
+        </h3>
+      </div>
+
+      <ul class="contents">
+        {
+          rows.map((row, i) => {
+            const isLast = i === rows.length - 1;
+            return (
+              <li
+                class="grid gap-4 rounded-media border border-line-compare p-6 md:contents"
+              >
+                <div
+                  class:list={[
+                    'md:py-10 md:pr-11',
+                    !isLast && 'md:border-b md:border-line-compare',
+                  ]}
+                >
+                  <p
+                    class="mb-2 flex items-center gap-2 font-mono text-label-sm font-medium tracking-label text-ink-faint uppercase md:hidden"
+                  >
+                    <span
+                      class="size-1.5 rounded-full bg-ink-subtle"
+                      aria-hidden="true"
+                    />
+                    {t('compare.without')}
+                  </p>
+                  <p class="text-body-lg leading-row text-pretty text-ink-subtle">
+                    {t(row.without)}
+                  </p>
+                </div>
+
+                <div
+                  class:list={[
+                    'md:bg-fill-ghost md:py-10 md:pl-11',
+                    !isLast && 'md:border-b md:border-line-compare',
+                  ]}
+                >
+                  <p
+                    class="mb-2 flex items-center gap-2 font-mono text-label-sm font-medium tracking-label text-ink uppercase md:hidden"
+                  >
+                    <span
+                      class="size-1.5 rounded-full bg-accent"
+                      aria-hidden="true"
+                    />
+                    {t('compare.with')}
+                  </p>
+                  <p class="text-body-lg leading-row text-pretty text-ink">
+                    {t(row.with)}
+                  </p>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </div>
+</section>

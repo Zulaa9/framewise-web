@@ -1,0 +1,287 @@
+---
+import type { TranslationKey } from '../i18n/ui';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+/**
+ * Segmented scroll progress along the bottom edge of the header, doubling as a
+ * section rail.
+ *
+ * One segment per top-level block of <main>, sized in proportion to that
+ * block's height, so the bar is also a map of the page: a long section reads as
+ * a long segment and every segment fills at the same rate. Equal widths would
+ * make the five feature blocks — roughly half the page — crawl while short
+ * sections flick past.
+ *
+ * Segments are built by script rather than rendered here because their number
+ * and proportions come from measured layout. The page is fully navigable by
+ * scrolling, so the rail is an enhancement and its absence without JS costs
+ * nothing.
+ *
+ * Labels are keyed by the `data-section` attribute on each block and passed in
+ * as JSON, so translations stay in the i18n dictionary and the page composition
+ * stays the single source of truth for which sections exist and in what order.
+ */
+const sectionLabels: Record<string, TranslationKey> = {
+  overview: 'section.overview',
+  problem: 'section.problem',
+  features: 'section.features',
+  included: 'section.included',
+  cta: 'section.cta',
+};
+
+const labels = Object.fromEntries(
+  Object.entries(sectionLabels).map(([key, token]) => [key, t(token)]),
+);
+---
+
+<nav
+  data-scroll-progress
+  data-labels={JSON.stringify(labels)}
+  aria-label={t('nav.sections')}
+  class="absolute inset-x-0 bottom-0"
+>
+  <!--
+    pointer-events-none on the rail, auto on the links: only the anchors capture
+    the pointer, so the 24px hit band can overlap the bottom of the nav row
+    without stealing clicks from the buttons sitting above it.
+  -->
+  <ul
+    data-rail
+    class="group/rail pointer-events-none flex h-6 items-end gap-px"
+  >
+  </ul>
+</nav>
+
+<!--
+  is:global is required, not laziness: the list items are created by the script
+  below, so they never receive Astro's scoping attribute and a scoped rule could
+  not match them. The [data-rail] prefix keeps the selectors contained.
+-->
+<style is:global>
+  /* Edge tooltips would otherwise centre past the viewport. */
+  [data-rail] > li:first-child [data-label] {
+    left: 0;
+    transform: none;
+  }
+
+  [data-rail] > li:last-child [data-label] {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+</style>
+
+<script>
+  const rail = document.querySelector<HTMLElement>('[data-rail]');
+  const root = document.querySelector<HTMLElement>('[data-scroll-progress]');
+  const main = document.querySelector('main');
+
+  if (rail && root && main) {
+    const labels: Record<string, string> = JSON.parse(
+      root.dataset.labels || '{}',
+    );
+    const blocks = Array.from(main.children) as HTMLElement[];
+
+    const fills = blocks.map((block) => {
+      const key = block.dataset.section ?? '';
+      const label = labels[key] ?? '';
+
+      const item = document.createElement('li');
+      item.className = 'relative flex h-full items-end';
+
+      // The visible bar. Always present, even where the link is not.
+      const track = document.createElement('span');
+      track.className =
+        'block h-0.5 w-full overflow-hidden rounded-full bg-line-soft transition-[height] duration-200 ease-out group-hover/rail:h-1.5 group-focus-within/rail:h-1.5';
+
+      const fill = document.createElement('span');
+      fill.className = 'block h-full w-full origin-left bg-accent';
+      fill.style.transform = 'scaleX(0)';
+      track.appendChild(fill);
+      item.appendChild(track);
+
+      // The link overlays the track with a 24px hit band — the WCAG 2.2 minimum
+      // target size, and about the smallest strip a pointer can hit reliably.
+      //
+      // md-and-up only: below that the narrowest segment is roughly 18px wide,
+      // well under the same minimum, and there is no hover to reveal the label
+      // anyway. `hidden` rather than a pointer-events toggle so the link leaves
+      // the tab order and the accessibility tree entirely on small screens,
+      // instead of lingering as a focusable target nobody can use.
+      if (label && block.id) {
+        const link = document.createElement('a');
+        link.href = `#${block.id}`;
+        link.className =
+          'group/seg pointer-events-auto absolute inset-x-0 bottom-0 hidden h-6 md:block';
+
+        const tip = document.createElement('span');
+        tip.dataset.label = '';
+        tip.textContent = label;
+        tip.className =
+          'pointer-events-none absolute top-full left-1/2 mt-2.5 -translate-x-1/2 rounded-btn border border-line bg-chip px-2.5 py-1.5 font-mono text-label-sm whitespace-nowrap text-ink opacity-0 backdrop-blur-[10px] transition-opacity duration-150 group-hover/seg:opacity-100 group-focus-visible/seg:opacity-100';
+
+        link.appendChild(tip);
+        item.appendChild(link);
+      }
+
+      rail.appendChild(item);
+      return fill;
+    });
+
+    let metrics: { top: number; height: number }[] = [];
+    // The scrollY a section actually lands on when its anchor is followed —
+    // its geometric top minus its own scroll-margin-top. Most blocks reserve
+    // 76px there so the fixed header doesn't cover the heading; overview and
+    // the hero demo reserve none, since they're meant to sit flush with the
+    // viewport edge (see their own scroll-margin comments).
+    let landings: number[] = [];
+    // Where each segment's fill should read 0 / 1: landings[i] and
+    // landings[i + 1], not metrics[i].top and metrics[i].top + metrics[i].height.
+    // Using the raw geometry there was the bug — a section's own segment always
+    // finishes short by its NEXT sibling's scroll-margin, because that margin is
+    // scroll room the browser deliberately leaves unscrolled when you land on
+    // it, and the bar was demanding the viewport go there anyway.
+    let segmentStarts: number[] = [];
+    let segmentEnds: number[] = [];
+    let mainEnd = 0;
+    let maxScroll = 1;
+    let rampStart = 0;
+    let rampSpan = 1;
+    let deficit = 0;
+
+    const measure = () => {
+      const scrollY = window.scrollY;
+      metrics = blocks.map((el) => {
+        const rect = el.getBoundingClientRect();
+        return { top: rect.top + scrollY, height: Math.max(1, rect.height) };
+      });
+
+      landings = blocks.map((el, i) => {
+        const marginTop = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+        return metrics[i].top - marginTop;
+      });
+
+      // Cached here rather than read per scroll event: scrollHeight and
+      // innerHeight are layout reads, and doing them inside the scroll handler
+      // would force a reflow on every frame of a scroll.
+      const docHeight = document.documentElement.scrollHeight;
+      const viewport = window.innerHeight;
+      maxScroll = Math.max(1, docHeight - viewport);
+
+      // The playhead's target is where the LAST SEGMENT ends, not where the
+      // document ends. <footer> lives outside <main> and is not a segment, so
+      // scrollHeight overshoots by its height — aiming the ramp at scrollHeight
+      // pulled it wider than necessary and let it creep backward into whatever
+      // section preceded the short tail.
+      const last = metrics[metrics.length - 1];
+      mainEnd = last.top + last.height;
+
+      // If the trailing content (last segment + whatever sits below it, i.e.
+      // the footer) is shorter than one viewport, the viewport's top edge can
+      // never physically reach the last segment's own top — the page runs out
+      // of scroll room first. `deficit` is exactly the gap that leaves: how much
+      // farther the playhead must lead the viewport top by the time scrolling
+      // ends, so the last segment still reaches 100% at max scroll. Sized to the
+      // exact shortfall rather than a flat one-viewport window, so it never
+      // ramps further back than the geometry actually requires.
+      deficit = Math.max(0, mainEnd - maxScroll);
+      rampStart = Math.max(0, maxScroll - deficit);
+      rampSpan = Math.max(1, maxScroll - rampStart);
+
+      // A segment's fill window runs from its own landing point to the next
+      // segment's landing point — the actual pair of scroll positions a click
+      // will produce — except the last segment, which has no "next" anchor to
+      // borrow an end from and instead runs to the true content bottom.
+      segmentStarts = landings;
+      segmentEnds = landings
+        .slice(1)
+        .concat(mainEnd)
+        .map((v, i) => Math.max(v, segmentStarts[i] + 1));
+
+      // Proportional widths. flex-grow on a zero-basis track divides the bar by
+      // block height without needing to know the container's pixel width. Widths
+      // stay tied to true content height, not the landing points above — the bar
+      // is a map of how much page each section occupies, and that shouldn't
+      // shrink because of a scroll-offset reserved for the fixed header.
+      metrics.forEach((m, i) => {
+        const item = rail.children[i] as HTMLElement;
+        item.style.flexGrow = String(m.height);
+        item.style.flexBasis = '0';
+      });
+    };
+
+    // Write-only: every layout value it needs is cached by measure(), so this is
+    // cheap enough to run straight off the scroll event. That removes the usual
+    // requestAnimationFrame latch, which is a liability here — rAF is suspended
+    // while the tab is hidden, so a "ticking" flag set during a background
+    // scroll would never clear and the bar would stay frozen for good.
+    const update = () => {
+      const scrolled = window.scrollY;
+
+      // The playhead is the reading position the segments fill up to. For every
+      // section except possibly the last, it is simply the top edge of the
+      // viewport: jumping to a section's start leaves that section's segment at
+      // exactly 0 and every earlier one at exactly 100, matching where the user
+      // actually landed.
+      //
+      // It only leaves that pin when `deficit` is non-zero — i.e. only when the
+      // last segment is short enough that the page runs out of scroll room
+      // before the viewport top can reach it. In that case the playhead ramps
+      // ahead by exactly `deficit` over the last `rampSpan` of scrolling, which
+      // is sized to the shortfall itself rather than a flat window, so it drifts
+      // no further back into the preceding section than the geometry demands.
+      const tail =
+        deficit <= 0 || scrolled <= rampStart
+          ? 0
+          : Math.min(1, (scrolled - rampStart) / rampSpan);
+
+      const playhead = scrolled + deficit * tail;
+
+      for (let i = 0; i < segmentStarts.length; i++) {
+        const start = segmentStarts[i];
+        const end = segmentEnds[i];
+        const ratio = (playhead - start) / (end - start);
+        const clamped = Math.min(1, Math.max(0, ratio));
+        fills[i].style.transform = `scaleX(${clamped})`;
+      }
+    };
+
+    const remeasure = () => {
+      measure();
+      update();
+    };
+
+    remeasure();
+    window.addEventListener('scroll', update, { passive: true });
+
+    // Section heights move with viewport width, font loading and image swaps,
+    // so re-measure on any body resize rather than only on window resize.
+    //
+    // Both listeners, unconditionally — not ResizeObserver with window resize
+    // only as a fallback for browsers that lack it. Measured directly in this
+    // project's own preview tooling: a viewport resize did not reliably trigger
+    // the body's ResizeObserver callback, leaving the bar holding pre-resize
+    // geometry with no further signal to correct it. remeasure() is cheap and
+    // idempotent, so binding both costs nothing and removes a silent single
+    // point of failure — if either mechanism fires, the bar recovers.
+    window.addEventListener('resize', remeasure);
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(remeasure).observe(document.body);
+    }
+
+    // The concrete case this project actually hit: the initial remeasure() above
+    // can run while Geist Variable is still swapping in, so the hero is briefly
+    // measured against the fallback font's metrics — which wrap the two-line
+    // headline differently and can measure several hundred pixels taller than
+    // the settled layout. The reflow once the real font lands should itself
+    // trigger the ResizeObserver above, but that dependency is exactly what
+    // just proved unreliable, so this closes the actual race directly rather
+    // than trusting a second mechanism to catch its own fallout.
+    if (document.fonts) {
+      document.fonts.ready.then(remeasure);
+    }
+  }
+</script>

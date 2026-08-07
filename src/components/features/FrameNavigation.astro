@@ -1,0 +1,316 @@
+---
+import FeatureHeading from './FeatureHeading.astro';
+import DemoVideo from '../DemoVideo.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<!--
+  01 — full-bleed media, centred heading.
+
+  A real, working frame stepper: play/pause plus two buttons that step exactly
+  one video frame forward or back, with a live frame counter. This is the demo
+  footage placeholder (see public/media/LICENSE.md) wired up to the real
+  browser APIs the extension itself uses — no simulated/fake stepping.
+
+  Media height caps at `100svh - 25rem`, not just 720px/56vw — the previous
+  fixed cap made this the one feature block tall enough to need a second
+  scroll to see the whole thing on an ordinary laptop screen, while every
+  other feature fit in one. 25rem is this block's own non-video chrome
+  (heading + margins) at the width this was measured against, so the two
+  together settle just under one viewport tall on typical screens. Same
+  pattern HeroDemo.astro already uses for the same reason.
+-->
+<section aria-labelledby="f1-title" class="mx-auto max-w-showcase px-6">
+  <FeatureHeading
+    number="01"
+    id="f1-title"
+    label="f1.label"
+    title="f1.title"
+    body="f1.body"
+    size="lg"
+    class="mx-auto max-w-copy"
+    bodyClass="max-w-[36rem]"
+  />
+
+  <figure
+    data-frame-stepper
+    tabindex="0"
+    class="group relative mt-12 overflow-hidden rounded-media border border-line shadow-feature outline-offset-4 md:mt-14"
+  >
+    <DemoVideo
+      src="/media/karts-race.mp4"
+      type="video/mp4"
+      label={t('f1.video.label')}
+      heightClass="h-[min(calc(100svh-25rem),720px,56vw)] min-h-64"
+    >
+      <!-- Frame counter, top-left — matches the hero demo's chip. -->
+      <div
+        class="absolute top-4 left-4 flex items-center gap-2.5 rounded-btn border border-line bg-chip-soft px-3 py-2 font-mono text-label tracking-chip backdrop-blur-[10px] md:top-6 md:left-6"
+      >
+        <span
+          data-play-dot
+          class="size-1.5 shrink-0 rounded-full bg-ink-subtle transition-colors duration-200"
+          aria-hidden="true"
+        ></span>
+        <span aria-hidden="true" class="uppercase">{t('f1.frame')}</span>
+        <span data-frame-count class="tabular-nums">0000</span>
+      </div>
+
+      <!--
+        Transport controls, bottom-center. Each button sits in its own
+        relative wrapper so its tooltip can be positioned independently.
+        Tooltips open UPWARD (bottom-full, not top-full): the control bar
+        already sits near the bottom edge of DemoVideo's overflow-hidden
+        frame, and a tooltip opening downward from there would get clipped by
+        that same edge instead of being visible.
+      -->
+      <div
+        class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-pill border border-line-strong bg-chip-soft p-1.5 backdrop-blur-[10px] md:bottom-6"
+      >
+        <div class="group/ctrl relative">
+          <button
+            type="button"
+            data-prev-frame
+            aria-label={t('f1.prevFrame')}
+            class="flex size-9 items-center justify-center rounded-full text-ink transition-colors duration-150 hover:bg-fill-subtle active:bg-fill-subtle"
+          >
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M7 4v12M15 4 6 10l9 6V4Z" fill="currentColor" />
+            </svg>
+          </button>
+          <span
+            class="pointer-events-none absolute bottom-full left-1/2 mb-2.5 -translate-x-1/2 rounded-btn border border-line bg-chip px-2.5 py-1.5 font-mono text-label-sm whitespace-nowrap text-ink opacity-0 backdrop-blur-[10px] transition-opacity duration-150 group-hover/ctrl:opacity-100 group-focus-visible/ctrl:opacity-100"
+            aria-hidden="true"
+          >
+            {t('f1.prevFrame')}
+          </span>
+        </div>
+
+        <div class="group/ctrl relative">
+          <button
+            type="button"
+            data-play-pause
+            data-label-play={t('f1.play')}
+            data-label-pause={t('f1.pause')}
+            aria-pressed="false"
+            aria-label={t('f1.play')}
+            class="flex size-11 items-center justify-center rounded-full bg-ink text-bg transition-opacity duration-150 hover:opacity-87"
+          >
+            <svg
+              data-play-icon
+              width="16"
+              height="16"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path d="M6 4.5v11l9-5.5-9-5.5Z" fill="currentColor" />
+            </svg>
+          </button>
+          <span
+            data-play-tooltip
+            class="pointer-events-none absolute bottom-full left-1/2 mb-2.5 -translate-x-1/2 rounded-btn border border-line bg-chip px-2.5 py-1.5 font-mono text-label-sm whitespace-nowrap text-ink opacity-0 backdrop-blur-[10px] transition-opacity duration-150 group-hover/ctrl:opacity-100 group-focus-visible/ctrl:opacity-100"
+            aria-hidden="true"
+          >
+            {t('f1.play')}
+          </span>
+        </div>
+
+        <div class="group/ctrl relative">
+          <button
+            type="button"
+            data-next-frame
+            aria-label={t('f1.nextFrame')}
+            class="flex size-9 items-center justify-center rounded-full text-ink transition-colors duration-150 hover:bg-fill-subtle active:bg-fill-subtle"
+          >
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M13 4v12M5 4l9 6-9 6V4Z" fill="currentColor" />
+            </svg>
+          </button>
+          <span
+            class="pointer-events-none absolute bottom-full left-1/2 mb-2.5 -translate-x-1/2 rounded-btn border border-line bg-chip px-2.5 py-1.5 font-mono text-label-sm whitespace-nowrap text-ink opacity-0 backdrop-blur-[10px] transition-opacity duration-150 group-hover/ctrl:opacity-100 group-focus-visible/ctrl:opacity-100"
+            aria-hidden="true"
+          >
+            {t('f1.nextFrame')}
+          </span>
+        </div>
+      </div>
+    </DemoVideo>
+  </figure>
+</section>
+
+<script>
+  // Standard render frame rate for these Blender Foundation shorts. Used only
+  // as the starting guess for stepping — see calibration below.
+  const FALLBACK_FRAME_DURATION = 1 / 24;
+
+  document
+    .querySelectorAll<HTMLElement>('[data-frame-stepper]')
+    .forEach((root) => {
+      const video = root.querySelector<HTMLVideoElement>('[data-demo-video]');
+      const playBtn = root.querySelector<HTMLButtonElement>('[data-play-pause]');
+      const playIcon = root.querySelector<SVGElement>('[data-play-icon]');
+      const playTooltip = root.querySelector<HTMLElement>('[data-play-tooltip]');
+      const prevBtn = root.querySelector<HTMLButtonElement>('[data-prev-frame]');
+      const nextBtn = root.querySelector<HTMLButtonElement>('[data-next-frame]');
+      const frameCount = root.querySelector<HTMLElement>('[data-frame-count]');
+      const dot = root.querySelector<HTMLElement>('[data-play-dot]');
+      if (
+        !video || !playBtn || !playIcon || !playTooltip || !prevBtn ||
+        !nextBtn || !frameCount || !dot
+      ) {
+        return;
+      }
+
+      const playPath = 'M6 4.5v11l9-5.5-9-5.5Z';
+      const pausePath = 'M5.5 4.5h3v11h-3v-11ZM11.5 4.5h3v11h-3v-11Z';
+
+      // Refined from a rough default (standard 24fps render) into a measured
+      // value once the video actually starts producing frames — see
+      // requestVideoFrameCallback below. A fixed constant would silently drift
+      // if the placeholder clip is ever swapped for footage at another frame
+      // rate; this self-corrects instead.
+      let frameDuration = FALLBACK_FRAME_DURATION;
+      let calibrated = false;
+      let lastMediaTime: number | null = null;
+      const supportsFrameCallback = 'requestVideoFrameCallback' in video;
+
+      const updateFrameCount = (time: number) => {
+        const index = Math.max(0, Math.round(time / frameDuration));
+        frameCount.textContent = String(index).padStart(4, '0');
+      };
+
+      const onVideoFrame: VideoFrameRequestCallback = (_now, metadata) => {
+        if (lastMediaTime !== null) {
+          const delta = metadata.mediaTime - lastMediaTime;
+          // Sanity bounds exclude the jump a loop restart or a manual seek
+          // produces, so only genuine consecutive-frame deltas count.
+          if (delta > 0 && delta < 0.5) {
+            frameDuration = calibrated
+              ? frameDuration * 0.8 + delta * 0.2
+              : delta;
+            calibrated = true;
+          }
+        }
+        lastMediaTime = metadata.mediaTime;
+        updateFrameCount(metadata.mediaTime);
+        if (!video.paused) video.requestVideoFrameCallback(onVideoFrame);
+      };
+
+      // Bound unconditionally, not only when requestVideoFrameCallback is
+      // unsupported. `timeupdate` fires far less often (browsers throttle it
+      // to roughly 4/sec, not once per frame) and never calibrates
+      // frameDuration, but it is a basic media-element event with no
+      // dependency on the compositor — a safety net under rVFC rather than a
+      // replacement for it, so the counter still advances during playback
+      // even if the frame callback stalls for any reason.
+      video.addEventListener('timeupdate', () => {
+        if (!video.paused) updateFrameCount(video.currentTime);
+      });
+
+      const setPlayingUi = (playing: boolean) => {
+        const label = playing ? playBtn.dataset.labelPause! : playBtn.dataset.labelPlay!;
+        playBtn.setAttribute('aria-pressed', String(playing));
+        playBtn.setAttribute('aria-label', label);
+        playTooltip.textContent = label; // keep the visible tooltip in sync too
+        playIcon.innerHTML = `<path d="${playing ? pausePath : playPath}" fill="currentColor" />`;
+        dot.classList.toggle('bg-accent', playing);
+        dot.classList.toggle('bg-ink-subtle', !playing);
+        dot.classList.toggle('animate-[fw-pulse_2.2s_ease-in-out_infinite]', playing);
+      };
+
+      video.addEventListener('play', () => {
+        setPlayingUi(true);
+        // A fresh reading point: prevents the loop-restart or a preceding seek
+        // from being read as one huge (and instantly-discarded) frame delta.
+        lastMediaTime = null;
+        if (supportsFrameCallback) video.requestVideoFrameCallback(onVideoFrame);
+      });
+      video.addEventListener('pause', () => setPlayingUi(false));
+      video.addEventListener('seeked', () => {
+        if (video.paused) updateFrameCount(video.currentTime);
+      });
+
+      // Intent, not history: "false" once the visitor presses play, even if
+      // they'd paused before. See DemoVideo.astro's own comment on
+      // data-wants-paused for why this can't be a one-way "has this been
+      // touched" flag — that version silently broke the loop-recovery
+      // behaviour after any pause/resume cycle.
+      const setWantsPaused = (paused: boolean) => {
+        video.dataset.wantsPaused = String(paused);
+      };
+
+      const togglePlay = () => {
+        if (video.paused) {
+          setWantsPaused(false);
+          video.play();
+        } else {
+          setWantsPaused(true);
+          video.pause();
+        }
+      };
+      playBtn.addEventListener('click', togglePlay);
+
+      const step = (direction: 1 | -1) => {
+        if (!Number.isFinite(video.duration)) return;
+        setWantsPaused(true);
+        if (!video.paused) video.pause();
+        const lastFrame = video.duration - frameDuration * 0.5;
+        const target = video.currentTime + direction * frameDuration;
+        // Wraps at both ends rather than clamping. The clip loops during
+        // normal playback (`loop` on the element), and this source clip is
+        // only ~7s — clamping made stepping forward hit a wall at the last
+        // frame instead, which reads as the demo being broken rather than
+        // just short. Wrapping keeps it steppable indefinitely in either
+        // direction, matching what happens when you just let it play.
+        if (target > lastFrame) video.currentTime = 0;
+        else if (target < 0) video.currentTime = lastFrame;
+        else video.currentTime = target;
+      };
+
+      // Click (covers mouse, touch tap, and keyboard Enter/Space activation)
+      // takes exactly one step. Holding the pointer down repeats it — the
+      // "hold to step continuously" variant from the brief — without
+      // double-stepping on a quick tap, since the repeat timer only starts
+      // after a delay long enough to no longer read as a tap.
+      const wireStepButton = (button: HTMLButtonElement, direction: 1 | -1) => {
+        button.addEventListener('click', () => step(direction));
+
+        let holdTimer: number | undefined;
+        let repeatTimer: number | undefined;
+        const startHold = () => {
+          holdTimer = window.setTimeout(() => {
+            repeatTimer = window.setInterval(() => step(direction), 90);
+          }, 350);
+        };
+        const stopHold = () => {
+          window.clearTimeout(holdTimer);
+          window.clearInterval(repeatTimer);
+        };
+        button.addEventListener('pointerdown', startHold);
+        button.addEventListener('pointerup', stopHold);
+        button.addEventListener('pointerleave', stopHold);
+        button.addEventListener('pointercancel', stopHold);
+      };
+      wireStepButton(prevBtn, -1);
+      wireStepButton(nextBtn, 1);
+
+      // Arrow keys work when the demo has focus, matching the design's
+      // original ← → hint — now the hint is real rather than decorative.
+      root.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          step(-1);
+        } else if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          step(1);
+        } else if (event.key === ' ') {
+          event.preventDefault();
+          togglePlay();
+        }
+      });
+    });
+</script>

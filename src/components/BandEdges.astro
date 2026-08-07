@@ -1,0 +1,48 @@
+---
+/**
+ * Softens the boundary of a raised `bg-surface` band.
+ *
+ * The design separated bands with a 1px hairline plus a hard jump from the page
+ * background to the surface colour. At full-bleed width that reads as a slab
+ * edge — a visible cut across the viewport. These two gradients bleed the page
+ * background back over the band's first and last stretch, so the surface fades
+ * in and out instead of starting abruptly.
+ *
+ * The parent section needs `relative` and no border on the faded edges; its
+ * content wrapper needs `relative` too, so it paints above these layers.
+ */
+interface Props {
+  /** Render only one edge when the neighbouring section is also a band. */
+  edges?: 'both' | 'top' | 'bottom';
+}
+
+const { edges = 'both' } = Astro.props;
+
+// Shorter on mobile, where the band's own vertical padding is much tighter and
+// a 160px fade would reach into the content.
+const size = 'h-24 md:h-40';
+---
+
+{
+  (edges === 'both' || edges === 'top') && (
+    <div
+      aria-hidden="true"
+      class:list={[
+        'pointer-events-none absolute inset-x-0 top-0 bg-linear-to-b from-bg to-transparent',
+        size,
+      ]}
+    />
+  )
+}
+
+{
+  (edges === 'both' || edges === 'bottom') && (
+    <div
+      aria-hidden="true"
+      class:list={[
+        'pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-bg to-transparent',
+        size,
+      ]}
+    />
+  )
+}

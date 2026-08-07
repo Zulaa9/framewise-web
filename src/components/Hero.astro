@@ -1,0 +1,76 @@
+---
+import { links } from '../i18n/ui';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<!--
+  The pitch only — headline, subhead, CTAs. There used to be a dedicated demo
+  band directly below this (HeroDemo.astro) — a placeholder mockup standing in
+  for a product recording that was never produced. Removed once every feature
+  section further down became a real, working demo: a fake preview sitting
+  right below the fold, first thing after the hero, undercut the fact that
+  everything past it is genuinely real. The secondary CTA below now jumps
+  straight to that real content instead of to a mockup.
+
+  The section is exactly one viewport tall so its bottom edge lands on the
+  fold: the hero fills the screen and the cut sits precisely where scrolling
+  begins. This is a height tied to the viewport rather than tuned padding, so
+  it holds on any display instead of only the one it was eyeballed on.
+
+  `svh`, not `vh`: on mobile `100vh` measures the viewport with the browser UI
+  hidden, so the hero overflows by the height of the address bar. `svh` uses the
+  smallest state and always fits. `dvh` would fit too but reflows as the bar
+  hides and shows, which moves the rule while the user scrolls.
+
+  min-height, not height — if the copy is taller than the screen (short laptop,
+  large text, long translation) the section grows instead of clipping.
+
+  pt-19 matches the fixed header exactly, so justify-center optically centres the
+  content in the area actually visible below it rather than the whole viewport.
+-->
+<section
+  id="overview"
+  data-section="overview"
+  class="relative flex min-h-svh flex-col justify-center px-6 pt-19 pb-14 text-center"
+  data-hero
+>
+  <p
+    class="font-mono text-label font-medium tracking-eyebrow text-ink-faint uppercase"
+  >
+    {t('hero.eyebrow')}
+  </p>
+
+  <h1
+    class="mx-auto mt-6 max-w-headline text-display leading-display tracking-display md:mt-8"
+  >
+    {t('hero.headline.line1')}<br />{t('hero.headline.line2')}
+  </h1>
+
+  <p
+    class="mx-auto mt-6 max-w-[30rem] text-lead leading-lead text-ink-muted md:mt-8"
+  >
+    {t('hero.subhead')}
+  </p>
+
+  <div class="mt-10 flex flex-wrap items-center justify-center gap-3 md:mt-12">
+    <a
+      href={links.chrome}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="rounded-cta bg-ink px-7 py-4 text-ui font-medium text-bg transition-opacity duration-200 hover:opacity-87"
+    >
+      {t('hero.cta.primary')}
+    </a>
+    <a
+      href="#features"
+      class="rounded-cta border border-line-strong px-7 py-4 text-ui font-medium transition-colors duration-200 hover:border-line-hover"
+    >
+      {t('hero.cta.secondary')}
+    </a>
+  </div>
+
+  <p class="mt-5 font-mono text-label text-ink-faint">{t('hero.meta')}</p>
+</section>

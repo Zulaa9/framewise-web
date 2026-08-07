@@ -1,0 +1,52 @@
+---
+import Logo from './Logo.astro';
+import { links, type TranslationKey } from '../i18n/ui';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const footerLinks: { label: TranslationKey; href: string }[] = [
+  { label: 'footer.github', href: links.github },
+  { label: 'footer.chrome', href: links.chrome },
+  { label: 'footer.edge', href: links.edge },
+];
+---
+
+<!--
+  No placeholder-footage attribution row: the Pexels License covers every clip
+  used on this page and explicitly does not require credit (see
+  public/media/LICENSE.md). That wasn't true of the Blender Foundation clips
+  used earlier, which is the only reason this footer ever carried one.
+-->
+<footer class="border-t border-line-soft px-6 py-16 md:px-13">
+  <div
+    class="flex flex-col items-center gap-8 text-center sm:flex-row sm:justify-between sm:gap-4 sm:text-left"
+  >
+    <p class="flex items-center gap-2.5 text-sm text-ink-subtle">
+      <!-- Dimmed variant: the mark inherits the muted text colour rather than
+           the accent, matching the design's footer treatment. -->
+      <Logo size={17} accent="currentColor" class="text-ink-strong" />
+      {t('footer.copyright')}
+    </p>
+
+    <nav aria-label={t('footer.links')}>
+      <ul class="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+        {
+          footerLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-sm text-ink-subtle transition-colors duration-200 hover:text-ink"
+              >
+                {t(link.label)}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</footer>

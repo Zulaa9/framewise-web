@@ -1,0 +1,49 @@
+---
+import BandEdges from './BandEdges.astro';
+import { links } from '../i18n/ui';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section
+  id="get-started"
+  data-section="cta"
+  aria-labelledby="cta-heading"
+  class="relative scroll-mt-19 border-t border-line-soft bg-well px-6 py-band-lg text-center"
+>
+  <!--
+    --color-well, not --color-surface: this used to match FeatureGrid above
+    it, and a hard rule alone between two identical colours barely read as a
+    cut at all — the border was there but the eye had nothing either side of
+    it to actually notice. Recessed --color-well is the same treatment the
+    hero demo band uses one section into the page, for the same reason: a
+    genuine colour change plus the hard rule reads as a deliberate break, not
+    just a hairline floating in a single-colour field.
+
+    Bottom edge keeps its BandEdges fade: Footer below sits on the plain page
+    background, an actual colour change this band still needs to blend into.
+  -->
+  <BandEdges edges="bottom" />
+
+  <div class="relative">
+    <h2
+      id="cta-heading"
+      class="mx-auto max-w-headline text-h2 leading-cta tracking-heading"
+    >
+      {t('cta.title')}
+    </h2>
+
+    <a
+      href={links.chrome}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mt-12 inline-block rounded-cta bg-ink px-8 py-4 text-ui font-medium text-bg transition-opacity duration-200 hover:opacity-87"
+    >
+      {t('cta.button')}
+    </a>
+
+    <p class="mt-5 font-mono text-label text-ink-faint">{t('cta.meta')}</p>
+  </div>
+</section>

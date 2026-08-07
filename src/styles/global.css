@@ -1,0 +1,232 @@
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+/* ---------------------------------------------------------------------------
+   Framewise design tokens
+   Values extracted from the Claude Design HTML export. Where a value was
+   changed on purpose, the source value is noted as `was:` — see tokens.md.
+   --------------------------------------------------------------------------- */
+
+@theme {
+  /* -- Typefaces ---------------------------------------------------------- */
+  --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* -- Core surfaces ------------------------------------------------------ */
+  --color-bg: #17181b;          /* page background */
+  --color-well: #131418;        /* recessed band: hero demo, closing CTA */
+  --color-surface: #1b1c1f;     /* raised bands: comparison, mini-feature grid */
+  --color-ink: #eeece9;         /* primary foreground */
+  --color-accent: #e8637a;      /* brand accent (design offers 4 presets) */
+
+  /* Accent alternates from the design export, kept for reference/theming. */
+  --color-accent-blue: #5b8def;
+  --color-accent-green: #3fb88a;
+  --color-accent-amber: #d99a4e;
+
+  /* -- Foreground ramp (tints of --color-ink over --color-bg) -------------
+     Contrast ratios measured against #17181b. All values used for text at
+     or below 18px clear WCAG AA (4.5:1).                                   */
+  --color-ink-strong: rgb(238 236 233 / 0.7);   /*  8.3:1 */
+  --color-ink-muted: rgb(238 236 233 / 0.6);    /*  6.2:1  was 0.55/0.58 */
+  --color-ink-subtle: rgb(238 236 233 / 0.5);   /*  4.7:1 */
+  --color-ink-faint: rgb(238 236 233 / 0.6);    /*  6.2:1  was 0.36–0.42 (failed AA) */
+
+  /* Large decorative section numerals — not text, but must stay legible. */
+  --color-numeral: rgb(238 236 233 / 0.16);     /*  was 0.07 (near-invisible) */
+
+  /* -- Hairlines & strokes ------------------------------------------------ */
+  --color-line: rgb(255 255 255 / 0.1);
+  --color-line-soft: rgb(255 255 255 / 0.07);
+  --color-line-strong: rgb(255 255 255 / 0.14);
+  --color-line-hover: rgb(255 255 255 / 0.32);
+
+  /* Comparison table dividers — lifted for the contrast bump you asked for. */
+  --color-line-compare: rgb(255 255 255 / 0.12); /* was 0.06 */
+
+  /* -- Overlay chrome (chips over media) ---------------------------------- */
+  --color-chip: rgb(23 24 27 / 0.85);
+  --color-chip-soft: rgb(23 24 27 / 0.78);
+  --color-nav: rgb(20 20 22 / 0.7);
+  --color-fill-subtle: rgb(255 255 255 / 0.03);
+  --color-fill-ghost: rgb(255 255 255 / 0.018);
+
+  /* -- Type scale ---------------------------------------------------------
+     Fluid: mobile floor → desktop value from the export.                    */
+  --text-display: clamp(2.75rem, 1.35rem + 6.2vw, 5.75rem);   /*  44 →  92 */
+  --text-h2: clamp(2rem, 1.5rem + 2.2vw, 3rem);               /*  32 →  48 */
+  --text-h3-lg: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);        /*  28 →  44 */
+  --text-h3: clamp(1.625rem, 1.35rem + 1.2vw, 2.375rem);      /*  26 →  38 */
+  --text-lead: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);       /*  17 →  20 */
+  --text-figure: clamp(3.5rem, 2rem + 6vw, 5.5rem);           /*  56 →  88 */
+  --text-stat-lg: clamp(3rem, 2.2rem + 3vw, 4rem);            /*  48 →  64 */
+  --text-stat: clamp(2.25rem, 1.9rem + 1.4vw, 2.75rem);       /*  36 →  44 */
+
+  --text-body-lg: 1.125rem;      /* 18   comparison rows, pills intro */
+  --text-body: 1.0625rem;        /* 17   feature paragraphs */
+  --text-ui: 0.9375rem;          /* 15   buttons, wordmark */
+  --text-ui-sm: 0.84375rem;      /* 13.5 nav button */
+  --text-sm: 0.875rem;           /* 14   grid card body, footer */
+  --text-xs: 0.8125rem;          /* 13   media chips */
+  --text-label: 0.78125rem;      /* 12.5 mono eyebrows */
+  --text-label-sm: 0.71875rem;   /* 11.5 grid card index */
+
+  /* -- Line heights ------------------------------------------------------- */
+  --leading-display: 1.04;
+  --leading-heading: 1.16;
+  --leading-cta: 1.15;
+  --leading-intro: 1.5;
+  --leading-row: 1.55;
+  --leading-body: 1.65;
+  --leading-lead: 1.6;
+
+  /* -- Letter spacing ----------------------------------------------------- */
+  --tracking-display: -0.03em;
+  --tracking-heading: -0.02em;
+  --tracking-wordmark: -0.01em;
+  --tracking-chip: 0.03em;
+  --tracking-label: 0.05em;
+  --tracking-section: 0.08em;
+  --tracking-eyebrow: 0.1em;
+
+  /* -- Radii ---------------------------------------------------------------
+     Deliberately NOT named sm/md/lg/xl — those would silently redefine
+     Tailwind's own `rounded-sm`…`rounded-3xl`.                              */
+  --radius-chip: 0.4375rem;    /*   7px media chips */
+  --radius-btn: 0.5rem;        /*   8px nav button */
+  --radius-cta: 0.625rem;      /*  10px primary CTA */
+  --radius-shot: 1rem;         /*  16px screenshot frame */
+  --radius-pip: 1.125rem;      /*  18px floating-window frame */
+  --radius-media-sm: 1.25rem;  /*  20px speed media */
+  --radius-media: 1.375rem;    /*  22px feature / volume media */
+  --radius-hero: 1.5rem;       /*  24px hero media */
+  --radius-panel: 1.75rem;     /*  28px feature 03 panel */
+  --radius-pill: 6.25rem;      /* 100px pills, volume scale */
+
+  /* -- Elevation ---------------------------------------------------------- */
+  --shadow-hero: 0 100px 160px -60px rgb(0 0 0 / 0.7);
+  --shadow-feature: 0 90px 140px -60px rgb(0 0 0 / 0.65);
+  --shadow-volume: 0 90px 140px -60px rgb(0 0 0 / 0.6);
+  --shadow-frame: 0 60px 100px -40px rgb(0 0 0 / 0.55);
+  --shadow-frame-sm: 0 50px 90px -30px rgb(0 0 0 / 0.55);
+
+  /* -- Section rhythm -----------------------------------------------------
+     --spacing-band was 80 → 180 (clamp(5rem, 3rem + 9vw, 11.25rem)); cut down
+     after it read as too much empty space above "El problema" and above/below
+     "También incluido" — both butt against a hard-cut edge rather than fading
+     into other content, which makes generous padding there read as a gap
+     rather than breathing room. */
+  --spacing-band: clamp(3.5rem, 2.25rem + 6vw, 7.5rem);  /*  56 → 120 band padding */
+  --spacing-band-lg: clamp(6rem, 3rem + 12vw, 15rem);    /*  96 → 240 CTA */
+  --spacing-feature: clamp(6rem, 3rem + 11vw, 13.75rem); /*  96 → 220 between features */
+  /* Top edge of the feature block only — was sharing --spacing-feature with
+     the gaps *between* features (also used for py-feature), which made the
+     whitespace above feature 01 read the same as a full inter-feature gap
+     despite not being flagged as excessive by comparison. Smaller and
+     decoupled so shrinking it doesn't also compress the 01↔02↔03↔04 rhythm,
+     which was never the complaint. */
+  --spacing-feature-top: clamp(4rem, 2.5rem + 5vw, 7rem); /*  64 → 112 */
+
+  /* -- Content widths ------------------------------------------------------
+     Avoiding `prose` and `full`: Tailwind ships static `max-w-prose` (65ch)
+     and `max-w-full` (100%) that these would never win against.             */
+  --container-copy: 40rem;       /*  640 centred copy blocks */
+  --container-compare: 55rem;    /*  880 comparison table */
+  --container-headline: 57.5rem; /*  920 h1 */
+  --container-grid: 61.25rem;    /*  980 mini-feature grid */
+  --container-page: 77.5rem;     /* 1240 main feature column */
+  --container-wide: 87.5rem;     /* 1400 volume media */
+  --container-showcase: 100rem;  /* 1600 feature 01 */
+
+  /* -- Motion ------------------------------------------------------------- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-wrap: pretty;
+    /* Feature 03's video deliberately bleeds half off the true left edge of
+       the viewport (see FloatingControls.astro) — without this, the part
+       past x=0 would still be laid out there and turn into real horizontal
+       scroll room instead of just disappearing off-screen. `clip`, not
+       `hidden`: hidden would make body a scroll container capable of being
+       scrolled programmatically/by keyboard; clip removes the overflowing
+       content from paint without body ever becoming a scrollport. Vertical
+       scrolling is untouched — this only constrains the x axis. */
+    overflow-x: clip;
+  }
+
+  /* Scrollbar toned down to match the dark UI rather than removed. It is still
+     a real scrollbar: it shows the page has more content, how much is left, and
+     stays draggable — which the nav progress bar cannot replace. To hide it
+     completely instead, swap the width/scrollbar-width values for `none`. */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.16) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(255 255 255 / 0.16);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 100px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255 255 255 / 0.3);
+    background-clip: content-box;
+  }
+
+  /* The design leans on weight 560 — only reachable with the variable face. */
+  h1, h2, h3 {
+    font-weight: 560;
+    text-wrap: balance;
+  }
+
+  /* Visible focus ring on every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Accent status dot used in the hero chip and the comparison header. */
+@keyframes fw-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

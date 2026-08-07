@@ -1,0 +1,60 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { langLabels, languages, type Lang } from '../i18n/ui';
+import { getLangFromUrl, getRouteFromUrl, useTranslations } from '../i18n/utils';
+
+/**
+ * Two-segment EN/ES switch.
+ *
+ * Real anchors to the localised URL of the *current* route — no JavaScript, and
+ * it keeps working with the page open in a new tab. Styled after the volume
+ * scale further down the page (pill track, filled active segment).
+ */
+const currentLang = getLangFromUrl(Astro.url);
+const route = getRouteFromUrl(Astro.url);
+const t = useTranslations(currentLang);
+
+const options = (Object.keys(languages) as Lang[]).map((code) => ({
+  code,
+  /** Visible abbreviation — hidden from assistive tech in favour of the full name. */
+  label: langLabels[code],
+  /** Endonym, so a screen reader announces "Español" rather than "Spanish". */
+  name: languages[code],
+  href: getRelativeLocaleUrl(code, route),
+  isActive: code === currentLang,
+}));
+---
+
+<nav aria-label={t('nav.language')}>
+  <ul
+    class="flex items-center gap-1 rounded-pill border border-line bg-fill-subtle p-1 font-mono text-label"
+  >
+    {
+      options.map(({ code, label, name, href, isActive }) => (
+        <li>
+          <!--
+            The visible label is a two-letter abbreviation, so the accessible
+            name comes from aria-label instead — spelled in the target language
+            and paired with lang/hreflang so it is announced with the right
+            pronunciation.
+          -->
+          <a
+            href={href}
+            hreflang={code}
+            lang={code}
+            aria-label={name}
+            aria-current={isActive ? 'true' : undefined}
+            class:list={[
+              'block rounded-pill px-2.5 py-1 tracking-chip transition-colors duration-200',
+              isActive
+                ? 'bg-ink font-medium text-bg'
+                : 'text-ink-faint hover:text-ink',
+            ]}
+          >
+            {label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

@@ -1,0 +1,198 @@
+---
+import BandEdges from './BandEdges.astro';
+import type { TranslationKey } from '../i18n/ui';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+/**
+ * Icon markup is inlined rather than imported so each card stays a single data
+ * entry. Strings are authored here, never user input, so set:html is safe.
+ */
+const items: { title: TranslationKey; body: TranslationKey; icon: string }[] = [
+  {
+    title: 'grid.fps.title',
+    body: 'grid.fps.body',
+    icon: `<circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+           <line x1="10" y1="10" x2="10" y2="4.5" stroke="currentColor" stroke-width="1.3"/>
+           <line x1="10" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.3"/>`,
+  },
+  {
+    title: 'grid.shortcuts.title',
+    body: 'grid.shortcuts.body',
+    icon: `<rect x="1" y="4" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+           <circle cx="10" cy="10" r="1.5" fill="currentColor"/>`,
+  },
+  {
+    title: 'grid.selection.title',
+    body: 'grid.selection.body',
+    icon: `<circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+           <circle cx="10" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="1.3"/>`,
+  },
+  {
+    title: 'grid.detection.title',
+    body: 'grid.detection.body',
+    icon: `<circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+           <line x1="13" y1="13" x2="18.5" y2="18.5" stroke="currentColor" stroke-width="1.3"/>`,
+  },
+  {
+    title: 'grid.persist.title',
+    body: 'grid.persist.body',
+    icon: `<rect x="3" y="3" width="14" height="14" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+           <rect x="6.5" y="3" width="7" height="5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+           <line x1="6.5" y1="12" x2="13.5" y2="12" stroke="currentColor" stroke-width="1.3"/>`,
+  },
+  {
+    title: 'grid.privacy.title',
+    body: 'grid.privacy.body',
+    icon: `<path d="M10 2.5 L16.5 5 L16.5 10 C16.5 14 13.5 17 10 17.5 C6.5 17 3.5 14 3.5 10 L3.5 5 Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+           <path d="M7.2 10 L9.2 12 L13 7.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+];
+
+/**
+ * Use-case pills, folded into this section (see below) rather than living as
+ * their own page section — "also included" and "wherever there's a video"
+ * are both short, low-commitment lists that don't need a full band of
+ * whitespace each; one section reading as "here's the rest of the picture"
+ * flows better than two adjacent ones that each felt like they needed their
+ * own heading and breathing room for barely half a screen of content.
+ */
+const pills: TranslationKey[] = [
+  'pills.anime',
+  'pills.editing',
+  'pills.gameplay',
+  'pills.sports',
+  'pills.study',
+  'pills.streaming',
+  'pills.tutorials',
+  'pills.music',
+  'pills.lectures',
+  'pills.concerts',
+];
+---
+
+<!--
+  scroll-margin-top is a bespoke 0.75rem here, not the usual +4.75rem every
+  other anchor target uses. At the standard header-clearance offset, landing
+  here left most of the viewport occupied by this section's own top padding
+  before the actual grid appeared — clicking "Also included" in the section
+  rail scrolled to mostly empty space. A smaller offset than the header's own
+  4.75rem scrolls PAST most of that padding while still leaving real
+  breathing room above the eyebrow.
+
+  Went through a few rounds tuning this by eye against this section's own
+  measurements (the space being skipped is a mix of --spacing-band and the
+  eyebrow's own margins, not one clean CSS token to compute against like
+  FeatureSections.astro's equivalent fix):
+  -4.75rem, matching how far past the header-clearance line
+  FeatureSections.astro's fix goes, overshot — the fixed header is 4.75rem
+  tall, and that put the "Also included" eyebrow itself behind it.
+  -2rem cleared the header but only just (~12px gap) — read as the eyebrow
+  butting straight up against the header bar.
+  -1rem doubled that to ~28px — better, but still asked for more.
+  0.75rem lands the eyebrow with ~56px clear below the header, double the
+  previous gap; the grid arrives correspondingly later, trading a tighter
+  crop for the heading visibly having room around it. ScrollProgress.astro
+  reads this same computed value for its own landing math, so the rail still
+  reads 0% at this landing point automatically.
+-->
+<section
+  id="also-included"
+  data-section="included"
+  aria-labelledby="grid-heading"
+  class="relative scroll-mt-3 bg-surface px-6 py-band"
+>
+  <!--
+    Top edge only. The bottom neighbour (CTAFooter) is also a bg-surface
+    band now that the use-case pills were folded in here — fading this one
+    out and the next one back in from the page background would draw a
+    visible dip between two patches of the exact same colour. CTAFooter
+    closes the shared edge with a hard rule instead, the same pattern as the
+    hero demo band.
+  -->
+  <BandEdges edges="top" />
+
+  <div class="relative mx-auto max-w-grid">
+    <h2
+      id="grid-heading"
+      class="text-center font-mono text-label font-medium tracking-eyebrow text-ink-faint uppercase"
+    >
+      {t('grid.eyebrow')}
+    </h2>
+
+    <!--
+      Dividers come from a 1px grid gap over a tinted container rather than
+      per-cell borders — six cards, chosen deliberately so the grid divides
+      evenly into full rows at every breakpoint (3×2 at lg, 2×3 at sm, 1×6
+      below that), with no lonely odd-one-out card and no filler cells needed.
+
+      Margins/padding here (and around the pills below) were trimmed from
+      their original values: with 6 cards plus the pills folded into one
+      section, this was the one page-level block taller than a typical
+      viewport, needing a second scroll where every other section fits in
+      one. Nothing here touches the shared `py-band` this section's own top/
+      bottom padding uses — that value is shared with the comparison table
+      and CTA sections, both already the right height.
+    -->
+    <ul
+      class="mt-10 grid gap-px bg-line-soft sm:grid-cols-2 md:mt-12 lg:grid-cols-3"
+    >
+      {
+        items.map((item, i) => (
+          <li class="bg-surface px-0 py-6 sm:px-8 lg:px-10">
+            <div class="mb-4 flex items-baseline justify-between gap-4">
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 20 20"
+                class="shrink-0 text-ink"
+                aria-hidden="true"
+                focusable="false"
+                set:html={item.icon}
+              />
+              <span
+                class="font-mono text-label-sm text-ink-subtle"
+                aria-hidden="true"
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
+            </div>
+
+            <h3 class="text-base font-medium">{t(item.title)}</h3>
+            <p class="mt-2 text-sm leading-row text-pretty text-ink-subtle">
+              {t(item.body)}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!--
+      Use-case pills — previously their own section (UseCasePills.astro,
+      now folded in here and removed). Static labels, not filters or links:
+      the design gave them hover states; those are dropped deliberately,
+      since a hover affordance on something unclickable reads as a broken
+      control.
+    -->
+    <div class="mt-10 text-center md:mt-12">
+      <p class="mx-auto max-w-[28.75rem] text-body-lg leading-intro text-balance text-ink-subtle">
+        {t('pills.intro')}
+      </p>
+
+      <ul
+        aria-label={t('pills.list')}
+        class="mx-auto mt-8 flex max-w-copy flex-wrap justify-center gap-2.5"
+      >
+        {
+          pills.map((pill) => (
+            <li class="rounded-pill border border-line px-5 py-2.5 text-sm font-medium text-ink-strong">
+              {t(pill)}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

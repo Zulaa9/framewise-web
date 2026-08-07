@@ -1,0 +1,77 @@
+---
+import type { TranslationKey } from '../../i18n/ui';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+/**
+ * The numeral + label + title + body stack shared by all five feature blocks.
+ * Only the alignment and title size change between them.
+ */
+interface Props {
+  /** Ordinal shown as the oversized decorative numeral. */
+  number: string;
+  /** id for the <h2>, so the parent <section> can reference it. */
+  id: string;
+  label: TranslationKey;
+  title: TranslationKey;
+  body: TranslationKey;
+  align?: 'center' | 'start';
+  /** 44px in the design's full-width blocks, 38px in the narrower ones. */
+  size?: 'lg' | 'md';
+  /** Optional cap on the body copy measure. */
+  bodyClass?: string;
+  class?: string;
+}
+
+const {
+  number,
+  id,
+  label,
+  title,
+  body,
+  align = 'center',
+  size = 'md',
+  bodyClass,
+  class: className,
+} = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<div
+  class:list={[align === 'center' && 'text-center', className]}
+>
+  <!-- Decorative ordinal: the reading order already conveys the sequence. -->
+  <p
+    class="font-mono text-figure font-semibold leading-none tracking-heading text-numeral"
+    aria-hidden="true"
+  >
+    {number}
+  </p>
+
+  <p
+    class="mt-1 font-mono text-label font-medium tracking-section text-ink-faint uppercase"
+  >
+    {t(label)}
+  </p>
+
+  <h2
+    id={id}
+    class:list={[
+      'mt-5 leading-heading tracking-heading',
+      size === 'lg' ? 'text-h3-lg' : 'text-h3',
+    ]}
+  >
+    {t(title)}
+  </h2>
+
+  <p
+    class:list={[
+      'mt-5 text-body leading-body text-pretty text-ink-muted',
+      align === 'center' && 'mx-auto',
+      bodyClass,
+    ]}
+  >
+    {t(body)}
+  </p>
+</div>
