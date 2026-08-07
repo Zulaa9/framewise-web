@@ -360,5 +360,5 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = { en, es };
 export const links = {
   chrome: 'https://chromewebstore.google.com/',
   edge: 'https://microsoftedge.microsoft.com/addons',
-  github: 'https://github.com/',
+  github: 'https://github.com/Zulaa9/framewise-web',
 } as const;
