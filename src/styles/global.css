@@ -148,7 +148,20 @@
    --------------------------------------------------------------------------- */
 
 @layer base {
+  /* Instant by default, not smooth: Chromium fails to perform the browser's own
+     automatic scroll-to-#hash on a fresh full-page load when scroll-behavior is
+     already "smooth" at that point — the jump silently never happens and the
+     page sits at the top instead (hit this directly: switching language while
+     scrolled to a section, which lands on a fresh /es/#features-style URL, was
+     landing at the top). Smooth scrolling is re-enabled by a script in
+     Layout.astro once the page has settled past that initial jump, via the
+     .fw-smooth class below — so in-page navigation (the section rail, etc.)
+     still animates, only the very first paint of a page doesn't. */
   html {
+    scroll-behavior: auto;
+  }
+
+  html.fw-smooth {
     scroll-behavior: smooth;
   }
 
@@ -213,7 +226,12 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    html {
+    /* Belt-and-suspenders: the enabling script already checks this same media
+       query before ever adding .fw-smooth, but a class selector otherwise
+       outranks the plain "html" rule above, so this is restated here in case
+       the class survives from a bfcache restore or similar edge case. */
+    html,
+    html.fw-smooth {
       scroll-behavior: auto;
     }
 

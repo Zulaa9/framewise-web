@@ -103,5 +103,26 @@ const esHref = showLangRedirect ? getRelativeLocaleUrl('es', route) : '';
     </a>
 
     <slot />
+
+    <!--
+      Re-enables smooth scrolling (see the .fw-smooth rule in global.css) once the
+      page has settled past its own initial scroll-to-#hash, which is instant/auto
+      by default so that jump actually lands. Double rAF: one frame for the
+      browser's own fragment-scroll to happen, a second so anything it triggers
+      (layout from a just-swapped-in font, etc.) has also settled before smooth
+      scrolling turns back on for whatever the visitor does next.
+    -->
+    <script is:inline>
+      (function () {
+        function enableSmoothScroll() {
+          if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.classList.add('fw-smooth');
+          }
+        }
+        requestAnimationFrame(function () {
+          requestAnimationFrame(enableSmoothScroll);
+        });
+      })();
+    </script>
   </body>
 </html>

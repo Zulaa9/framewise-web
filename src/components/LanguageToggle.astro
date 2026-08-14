@@ -61,6 +61,26 @@ const options = (Object.keys(languages) as Lang[]).map((code) => ({
 </nav>
 
 <script>
+  // Qué sección de <main> está a la vista ahora mismo, para que cambiar de idioma
+  // aterrice en el mismo sitio en vez de en el top de la página. Reutiliza los mismos
+  // bloques con id que ScrollProgress.astro ya usa como fuente de verdad de las
+  // secciones — ambos hijos directos de <main>, así que no hace falta duplicar la lista.
+  function currentSectionId(): string | undefined {
+    const main = document.querySelector('main');
+    if (!main) return undefined;
+
+    // El header fijo tapa los primeros ~76px del viewport (ver scroll-margin-top de
+    // cada sección); una sección solo cuenta como "vista" una vez su borde superior ha
+    // pasado ese punto, igual que decide dónde aterriza su propio ancla.
+    const headerOffset = 100;
+    let current: string | undefined;
+    for (const el of Array.from(main.children) as HTMLElement[]) {
+      if (!el.id) continue;
+      if (el.getBoundingClientRect().top <= headerOffset) current = el.id;
+    }
+    return current;
+  }
+
   // Elección explícita: se guarda y a partir de ahí gana siempre sobre la detección del idioma del
   // navegador que hace Layout.astro en la raíz sin prefijo — mismo criterio que la extensión, donde
   // tocar el interruptor ES/EN fija el idioma para siempre hasta que se vuelva a tocar.
@@ -71,6 +91,16 @@ const options = (Object.keys(languages) as Lang[]).map((code) => ({
       } catch (e) {
         // localStorage inaccesible (modo privado estricto, etc.) — la navegación sigue
         // funcionando con normalidad, simplemente no se recuerda la elección la próxima vez.
+      }
+
+      // Reescribe el href en el propio handler de click, antes de que el navegador lo
+      // siga: en páginas sin estas secciones (privacy) currentSectionId() da undefined
+      // y el href se deja tal cual.
+      const id = currentSectionId();
+      if (id) {
+        const url = new URL(el.href);
+        url.hash = id;
+        el.href = url.toString();
       }
     });
   });
