@@ -9,9 +9,12 @@
  * Grows one section at a time as the page is built.
  */
 
+// Order here drives the toggle's left-to-right order (LanguageToggle.astro iterates
+// Object.keys(languages)) — Spanish first, matching the extension's own ES/EN switch
+// (Framewise-extension/options.html) so the same control reads the same way in both places.
 export const languages = {
-  en: 'English',
   es: 'Español',
+  en: 'English',
 } as const;
 
 export type Lang = keyof typeof languages;
