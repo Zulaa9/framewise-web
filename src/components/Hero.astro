@@ -72,5 +72,16 @@ const t = useTranslations(lang);
     </a>
   </div>
 
-  <p class="mt-5 font-mono text-label text-ink-faint">{t('hero.meta')}</p>
+  <p class="mt-5 font-mono text-label text-ink-faint">
+    {t('hero.meta')}
+    <span aria-hidden="true"> · </span>
+    <a
+      href={links.edge}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="underline decoration-line-strong underline-offset-2 transition-colors duration-200 hover:text-ink hover:decoration-ink"
+    >
+      {t('cta.meta')}
+    </a>
+  </p>
 </section>
