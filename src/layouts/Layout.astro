@@ -1,12 +1,24 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import '../styles/global.css';
-import { languages, type Lang } from '../i18n/ui';
+import { defaultLang, languages, type Lang } from '../i18n/ui';
 import { getLangFromUrl, getRouteFromUrl, useTranslations } from '../i18n/utils';
+
+interface Props {
+  /** Overrides the default site-wide <title>/og:title (t('meta.title')) — for pages with their own identity (e.g. the privacy policy) rather than the product pitch. */
+  title?: string;
+  /** Overrides the default site-wide description/og:description (t('meta.description')). */
+  description?: string;
+}
+
+const { title, description } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const route = getRouteFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+const pageTitle = title ?? t('meta.title');
+const pageDescription = description ?? t('meta.description');
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL('/og.svg', Astro.site);
@@ -16,15 +28,43 @@ const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
   code,
   href: new URL(getRelativeLocaleUrl(code, route), Astro.site).href,
 }));
+
+// Same rule as the extension (see detectBrowserLang in Framewise-extension/i18n.js): English only
+// if the browser's own UI language starts with "en", Spanish for everything else — English stays
+// the fallback of last resort. Only wired on the unprefixed default-locale pages ("/", "/privacy",
+// etc.) and only ever redirects towards Spanish, never away from it: a Spanish URL someone opened
+// on purpose (a shared link, a bookmark, a search result) must never get redirected out from under
+// them just because their browser happens to be in English — same reasoning as not stealing focus
+// from a URL the visitor explicitly navigated to. A stored explicit choice (the header's EN/ES
+// toggle, see LanguageToggle.astro) always wins over the live browser-language check, and persists
+// across visits — matching "once picked, it stays picked" on the extension side too.
+const showLangRedirect = lang === defaultLang;
+const esHref = showLangRedirect ? getRelativeLocaleUrl('es', route) : '';
 ---
 
 <!doctype html>
 <html lang={lang}>
   <head>
     <meta charset="utf-8" />
+    {showLangRedirect && (
+      <script is:inline define:vars={{ esHref }}>
+        (function () {
+          try {
+            var STORAGE_KEY = 'framewise-lang';
+            var stored = localStorage.getItem(STORAGE_KEY);
+            var wanted = stored;
+            if (!wanted) {
+              var nav = (navigator.language || (navigator.languages && navigator.languages[0]) || 'en').toLowerCase();
+              wanted = nav.indexOf('en') === 0 ? 'en' : 'es';
+            }
+            if (wanted === 'es') location.replace(esHref);
+          } catch (e) {}
+        })();
+      </script>
+    )}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{t('meta.title')}</title>
-    <meta name="description" content={t('meta.description')} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
     <link rel="canonical" href={canonical.href} />
 
     {alternates.map(({ code, href }) => (
@@ -44,8 +84,8 @@ const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Framewise" />
     <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
-    <meta property="og:title" content={t('meta.title')} />
-    <meta property="og:description" content={t('meta.description')} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImage.href} />
     <meta property="og:image:alt" content={t('meta.ogAlt')} />

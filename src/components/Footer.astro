@@ -1,15 +1,18 @@
 ---
+import { getRelativeLocaleUrl } from 'astro:i18n';
 import { links, type TranslationKey } from '../i18n/ui';
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const footerLinks: { label: TranslationKey; href: string }[] = [
+const externalFooterLinks: { label: TranslationKey; href: string }[] = [
   { label: 'footer.github', href: links.github },
   { label: 'footer.chrome', href: links.chrome },
   { label: 'footer.edge', href: links.edge },
 ];
+
+const privacyHref = getRelativeLocaleUrl(lang, 'privacy');
 ---
 
 <!--
@@ -31,8 +34,16 @@ const footerLinks: { label: TranslationKey; href: string }[] = [
 
     <nav aria-label={t('footer.links')}>
       <ul class="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+        <li>
+          <a
+            href={privacyHref}
+            class="text-sm text-ink-subtle transition-colors duration-200 hover:text-ink"
+          >
+            {t('footer.privacy')}
+          </a>
+        </li>
         {
-          footerLinks.map((link) => (
+          externalFooterLinks.map((link) => (
             <li>
               <a
                 href={link.href}

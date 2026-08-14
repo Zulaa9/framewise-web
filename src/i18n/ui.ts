@@ -183,6 +183,7 @@ const en = {
   'footer.github': 'GitHub',
   'footer.chrome': 'Chrome Web Store',
   'footer.edge': 'Edge Add-ons',
+  'footer.privacy': 'Privacy policy',
 
   // -- Shared ---------------------------------------------------------------
   'media.placeholder': 'Placeholder',
@@ -346,6 +347,7 @@ const es: Record<TranslationKey, string> = {
   'footer.github': 'GitHub',
   'footer.chrome': 'Chrome Web Store',
   'footer.edge': 'Edge Add-ons',
+  'footer.privacy': 'Política de privacidad',
 
   // -- Shared ---------------------------------------------------------------
   'media.placeholder': 'Marcador de posición',

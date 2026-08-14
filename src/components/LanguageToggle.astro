@@ -44,6 +44,7 @@ const options = (Object.keys(languages) as Lang[]).map((code) => ({
             lang={code}
             aria-label={name}
             aria-current={isActive ? 'true' : undefined}
+            data-lang-option={code}
             class:list={[
               'block rounded-pill px-2.5 py-1 tracking-chip transition-colors duration-200',
               isActive
@@ -58,3 +59,19 @@ const options = (Object.keys(languages) as Lang[]).map((code) => ({
     }
   </ul>
 </nav>
+
+<script>
+  // Elección explícita: se guarda y a partir de ahí gana siempre sobre la detección del idioma del
+  // navegador que hace Layout.astro en la raíz sin prefijo — mismo criterio que la extensión, donde
+  // tocar el interruptor ES/EN fija el idioma para siempre hasta que se vuelva a tocar.
+  document.querySelectorAll<HTMLAnchorElement>('[data-lang-option]').forEach((el) => {
+    el.addEventListener('click', () => {
+      try {
+        localStorage.setItem('framewise-lang', el.dataset.langOption!);
+      } catch (e) {
+        // localStorage inaccesible (modo privado estricto, etc.) — la navegación sigue
+        // funcionando con normalidad, simplemente no se recuerda la elección la próxima vez.
+      }
+    });
+  });
+</script>

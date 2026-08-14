@@ -1,0 +1,103 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const lastUpdated = '2026-08-14';
+---
+
+<Layout
+  title="Política de privacidad — Framewise"
+  description="Qué accede Framewise, por qué, y qué es lo que nunca hace con ello: sin recogida de datos, sin seguimiento, sin servidores."
+>
+  <Header />
+
+  <main id="main" class="px-6 pt-32 pb-band">
+    <article class="mx-auto max-w-copy">
+      <p class="font-mono text-label font-medium tracking-eyebrow text-ink-faint uppercase">
+        Legal
+      </p>
+      <h1 class="mt-4 text-h2 leading-heading tracking-heading">Política de privacidad</h1>
+      <p class="mt-3 text-sm text-ink-faint">Última actualización: {lastUpdated}</p>
+
+      <div class="mt-10 flex flex-col gap-8 text-body leading-body text-ink-muted">
+        <p>
+          Framewise es una extensión de navegador para Chrome y Edge. Esta página explica, en
+          lenguaje llano, a qué puede acceder y por qué — y, más importante todavía, qué es lo que
+          nunca hace con ello.
+        </p>
+
+        <section>
+          <h2 class="text-lg font-medium text-ink">La versión corta</h2>
+          <p class="mt-3">
+            Framewise no recoge nada, no manda nada a ningún sitio, y no tiene servidores. Cada
+            ajuste que configuras — atajos, presets de velocidad, volumen recordado por sitio, y
+            todo lo demás — se queda en tu dispositivo (y solo se sincroniza a través de la propia
+            sincronización de tu navegador, el mismo mecanismo que usan Chrome/Edge para tus
+            marcadores — Framewise nunca ve esos datos por sí misma). No hay analítica, ni
+            seguimiento, ni ningún tercero implicado en cómo funciona la extensión.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-medium text-ink">Por qué pide acceso a todos los sitios</h2>
+          <p class="mt-3">
+            Al instalar Framewise, tu navegador avisa de que puede "leer y cambiar todos tus datos
+            en todos los sitios web". Es el aviso estándar del permiso <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">host_permissions</code>{' '}
+            que necesita una extensión así — Framewise no puede saber de antemano en qué sitio vas
+            a querer control de vídeo fotograma a fotograma, así que pide poder buscar un elemento{' '}
+            <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">&lt;video&gt;</code> en
+            la página que sea. Solo actúa sobre el propio elemento de vídeo de esa página, y solo
+            cuando usas un atajo de Framewise o el popup — no lee el contenido de la página,
+            formularios, contraseñas, historial de navegación, ni nada más.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-medium text-ink">Para qué es cada permiso</h2>
+          <ul class="mt-3 flex flex-col gap-2 list-disc pl-5">
+            <li><strong class="text-ink">storage</strong> — guarda tu configuración (atajos, presets, memoria por sitio) localmente en tu navegador, y opcionalmente la sincroniza entre tus propios dispositivos mediante la sincronización de tu cuenta de navegador. Framewise en sí nunca recibe ni almacena estos datos en ningún otro sitio.</li>
+            <li><strong class="text-ink">scripting</strong> — permite que Framewise ejecute su script de control en la página que estás viendo, para encontrar el vídeo y responder a tus atajos. También se usa para recuperarse automáticamente si la extensión se acaba de actualizar mientras una pestaña ya estaba abierta.</li>
+            <li><strong class="text-ink">host_permissions (todos los sitios)</strong> — necesario por el motivo de arriba: el vídeo puede estar en cualquier sitio, y Framewise no preselecciona cuáles admitir.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-medium text-ink">Lo que Framewise nunca hace</h2>
+          <ul class="mt-3 flex flex-col gap-2 list-disc pl-5">
+            <li>Nunca manda ningún dato a ningún servidor — no existe ninguno.</li>
+            <li>Nunca incluye analítica, telemetría, ni reporte de errores de ningún tipo.</li>
+            <li>Nunca vende, comparte ni cede ningún dato a terceros, porque nunca se recoge ninguno para empezar.</li>
+            <li>Nunca lee contenido de la página ajeno al elemento de vídeo que controla (nada de formularios, contraseñas, ni historial de navegación).</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-medium text-ink">Privacidad de menores</h2>
+          <p class="mt-3">
+            Framewise no está dirigida a menores y no recoge información de nadie, de ninguna
+            edad, a sabiendas — sencillamente no se recoge nada.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-medium text-ink">Cambios en esta política</h2>
+          <p class="mt-3">
+            Si esta política cambia alguna vez, la actualización se publicará en esta misma página
+            con una nueva fecha de "última actualización" arriba.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-medium text-ink">Contacto</h2>
+          <p class="mt-3">
+            Las preguntas sobre esta política o los permisos de la extensión son bienvenidas — abre
+            un issue en el <a href="https://github.com/Zulaa9/framewise" target="_blank" rel="noopener noreferrer" class="text-ink underline underline-offset-2 hover:text-accent">repositorio de GitHub</a>.
+          </p>
+        </section>
+      </div>
+    </article>
+  </main>
+
+  <Footer />
+</Layout>
