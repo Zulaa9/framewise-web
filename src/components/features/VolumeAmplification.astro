@@ -15,12 +15,14 @@ const t = useTranslations(lang);
 const presets = [0, 50, 100, 150, 200, 250, 300];
 
 /**
- * Upper bound for the custom field. The extension itself has no hard ceiling
- * (see the ×∞ claim in the copy), but a live demo does need *some* limit —
- * past ~1000% a Web Audio GainNode mostly produces clipping distortion
- * rather than anything that reads as "louder", so there's nothing left to
- * usefully demonstrate above it. Purely a demo-safety bound, not a product
- * claim.
+ * Upper bound for the custom field. The extension itself has no hard ceiling —
+ * confirmed in its source: `volumeMax` is a plain configurable setting, not a
+ * clamped constant like `SPEED_MAX`, and its Options page has no <form> to
+ * enforce the input's `max` attribute, so the real product genuinely accepts
+ * any value. This demo still needs *some* limit — past ~1000% a Web Audio
+ * GainNode mostly produces clipping distortion rather than anything that
+ * reads as "louder", so there's nothing left to usefully demonstrate above
+ * it. Purely a demo-safety bound, not a product claim.
  */
 const customMax = 1000;
 ---

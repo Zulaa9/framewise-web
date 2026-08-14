@@ -93,11 +93,11 @@ const en = {
   'f2.body':
     'Jump between speed presets instantly, from frame-precise slow motion to fast previews — smooth at every setting.',
   'f2.stat1.label': 'Default range',
-  'f2.stat1.value': '0.25×–4×',
+  'f2.stat1.value': '0.1×–4×',
   'f2.stat1.caption': 'Out of the box',
   'f2.stat2.label': 'Configurable limit',
-  'f2.stat2.value': '×∞',
-  'f2.stat2.caption': 'Set any speed you want',
+  'f2.stat2.value': '×16',
+  'f2.stat2.caption': 'Set any speed you want, up to that ceiling',
   'f2.video.label': 'Playback speed demo',
   'f2.speedGroup': 'Playback speed',
 
@@ -105,7 +105,7 @@ const en = {
   'f3.label': 'Floating controls',
   'f3.title': 'Keep the video where you need it.',
   'f3.body':
-    'Pop any video into a floating, draggable window — or native Picture-in-Picture — and keep working around it.',
+    "Pop any video into native Picture-in-Picture, or pull Framewise's own controls into an always-on-top floating panel — and keep working around it.",
   'f3.video.label': 'Floating controls demo',
   'f3.pip.enter': 'Pop out',
   'f3.pip.exit': 'Bring back',
@@ -178,7 +178,7 @@ const en = {
   'cta.meta': 'Also available for Edge',
 
   // -- Footer ---------------------------------------------------------------
-  'footer.copyright': '© Framewise',
+  'footer.copyright': '© Framewise — Unax Zulaika Fuente',
   'footer.links': 'Footer',
   'footer.github': 'GitHub',
   'footer.chrome': 'Chrome Web Store',
@@ -253,11 +253,11 @@ const es: Record<TranslationKey, string> = {
   'f2.body':
     'Salta entre velocidades al instante, de la cámara lenta precisa al fotograma a las vistas rápidas — fluido en cualquier ajuste.',
   'f2.stat1.label': 'Rango por defecto',
-  'f2.stat1.value': '0.25×–4×',
+  'f2.stat1.value': '0.1×–4×',
   'f2.stat1.caption': 'De serie',
   'f2.stat2.label': 'Límite configurable',
-  'f2.stat2.value': '×∞',
-  'f2.stat2.caption': 'Ajusta la velocidad que quieras',
+  'f2.stat2.value': '×16',
+  'f2.stat2.caption': 'Ajusta la velocidad que quieras, hasta ese tope',
   'f2.video.label': 'Demo de velocidad de reproducción',
   'f2.speedGroup': 'Velocidad de reproducción',
 
@@ -265,7 +265,7 @@ const es: Record<TranslationKey, string> = {
   'f3.label': 'Controles flotantes',
   'f3.title': 'Ten el vídeo donde lo necesitas.',
   'f3.body':
-    'Saca cualquier vídeo a una ventana flotante y arrastrable — o al Picture-in-Picture nativo — y sigue trabajando a su alrededor.',
+    'Saca cualquier vídeo al Picture-in-Picture nativo, o convierte los propios controles de Framewise en un panel flotante siempre visible — y sigue trabajando a su alrededor.',
   'f3.video.label': 'Demo de controles flotantes',
   'f3.pip.enter': 'Sacar ventana',
   'f3.pip.exit': 'Traer de vuelta',
@@ -341,7 +341,7 @@ const es: Record<TranslationKey, string> = {
   'cta.meta': 'También disponible para Edge',
 
   // -- Footer ---------------------------------------------------------------
-  'footer.copyright': '© Framewise',
+  'footer.copyright': '© Framewise — Unax Zulaika Fuente',
   'footer.links': 'Pie de página',
   'footer.github': 'GitHub',
   'footer.chrome': 'Chrome Web Store',
@@ -355,10 +355,10 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = { en, es };
 
 /**
  * External destinations. Not translated — same URLs in every locale.
- * TODO: swap in the real store listings once the extension is published.
+ * TODO: swap chrome/edge for the real store listings once the extension is published.
  */
 export const links = {
   chrome: 'https://chromewebstore.google.com/',
   edge: 'https://microsoftedge.microsoft.com/addons',
-  github: 'https://github.com/Zulaa9/framewise-web',
+  github: 'https://github.com/Zulaa9/framewise',
 } as const;

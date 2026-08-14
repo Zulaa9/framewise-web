@@ -229,12 +229,18 @@ Everything else is a faithful 1:1 port.
 
 ---
 
-## 9. Open questions
+## 9. Resolved questions
 
-1. **Mixed languages.** Feature 02 in the export is partly Spanish — *"Velocidad
-   personalizada"*, *"por defecto"*, *"Y más velocidades personalizables"* —
-   while the rest of the page is English. Which way should it go?
-2. **Speed copy mismatch.** The paragraph says presets "up to 4x+", the stat block
-   says `×4 por defecto` and `×∞`, and the media chip shows `0.25×`. Worth
-   settling the actual product claim before I build that section.
-3. **Accent.** Staying on `#e8637a`, or do you want one of the other three presets?
+1. **Mixed languages.** Resolved by the i18n layer (`src/i18n/ui.ts`) — every
+   string now has a real English and Spanish version, selected per route.
+2. **Speed copy mismatch.** Resolved against the extension's actual limits.
+   Speed has a real hardcoded ceiling (`SPEED_MAX = 16` in `settings.js`,
+   enforced everywhere including on JSON import), so the stat block reads
+   `0.1×–4×` default range and `×16` configurable ceiling — both real,
+   product-enforced numbers. Volume has no such constant: `volumeMax` is a
+   plain configurable setting with no upper-bound validation anywhere in the
+   code, so `×∞` for the volume stat is accurate, not aspirational — don't
+   confuse it with the `1000` currently sitting in the Options page input,
+   which is just that field's default value, not a technical ceiling.
+3. **Accent.** Settled on `#e8637a` — matches the extension's own
+   `--color-accent` exactly (see `popup.css`/`options.css`).
