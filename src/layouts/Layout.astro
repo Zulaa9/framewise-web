@@ -46,6 +46,9 @@ const esHref = showLangRedirect ? getRelativeLocaleUrl('es', route) : '';
 <html lang={lang}>
   <head>
     <meta charset="utf-8" />
+    <!-- Google Search Console site-ownership verification for the Chrome Web Store
+         listing's "Official URL" field — do not remove, verification depends on it. -->
+    <meta name="google-site-verification" content="U6blOlZg4I-lf2Kl5YkfTS9gY7-vsUmFaR3s-wqLMGc" />
     {showLangRedirect && (
       <script is:inline define:vars={{ esHref }}>
         (function () {
