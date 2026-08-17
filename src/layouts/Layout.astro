@@ -47,8 +47,13 @@ const esHref = showLangRedirect ? getRelativeLocaleUrl('es', route) : '';
   <head>
     <meta charset="utf-8" />
     <!-- Google Search Console site-ownership verification for the Chrome Web Store
-         listing's "Official URL" field — do not remove, verification depends on it. -->
+         listing's "Official URL" field — do not remove, verification depends on it.
+         Two tags: the first Search Console property was created under the wrong
+         Google account (not the one the Chrome Web Store listing uses), so a second
+         one was verified under the right account instead of replacing it — each
+         account gets its own token, and a page can carry more than one of these. -->
     <meta name="google-site-verification" content="U6blOlZg4I-lf2Kl5YkfTS9gY7-vsUmFaR3s-wqLMGc" />
+    <meta name="google-site-verification" content="VTabtvP3i9HmueDAojhg-DHRM4UkIDQNcIpk3BV3GIw" />
     {showLangRedirect && (
       <script is:inline define:vars={{ esHref }}>
         (function () {
