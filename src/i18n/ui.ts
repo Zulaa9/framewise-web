@@ -360,13 +360,10 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = { en, es };
 
 /**
  * External destinations. Not translated — same URLs in every locale.
- * Edge points at the real listing (approved 2026-08-14). Chrome still points at the
- * store homepage — the listing is live on Edge but still in review on Chrome Web
- * Store, and https://chromewebstore.google.com/detail/framewise/mkpljcojmhhmkpamcdecnmjbndbabfae
- * 404s ("Elemento no disponible") until that review clears. Swap it in once it does.
+ * Both listings are approved and live: Edge on 2026-08-14, Chrome shortly after.
  */
 export const links = {
-  chrome: 'https://chromewebstore.google.com/',
+  chrome: 'https://chromewebstore.google.com/detail/framewise/mkpljcojmhhmkpamcdecnmjbndbabfae',
   edge: 'https://microsoftedge.microsoft.com/addons/detail/framewise/ppfmagbmfpeldadpbhbknlffhfnnhgee',
   github: 'https://github.com/Zulaa9/framewise',
 } as const;
