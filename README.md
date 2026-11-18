@@ -2,7 +2,7 @@
 
 Marketing site for **Framewise**, a Chrome/Edge extension that puts you in full control of any web video: frame-by-frame navigation, speed control, Picture-in-Picture, screenshot & clip capture, and volume amplification beyond the browser's default 100% cap.
 
-**Live site:** [framewise.app](https://framewise.app) *(coming soon)*
+**Live site:** [framewise.zula.dev](https://framewise.zula.dev)
 
 ---
 

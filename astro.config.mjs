@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   // TODO: replace with the real production domain before deploying.
   // Used for canonical URLs, hreflang and absolute og:image paths.
-  site: 'https://framewise.app',
+  site: 'https://framewise.zula.dev',
 
   i18n: {
     locales: ['en', 'es'],
