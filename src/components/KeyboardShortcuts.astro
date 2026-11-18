@@ -1,0 +1,108 @@
+---
+import type { TranslationKey } from '../i18n/ui';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+/**
+ * Factory shortcuts, copied from ACTION_DEFS in the extension's settings.js
+ * (Zulaa9/framewise). Keep this list in sync with it whenever a default
+ * changes. Keys are not translated: they are what the keyboard shows.
+ * Each entry is a list of alternatives ("or"), each a list of keys ("then").
+ */
+const rows: { label: TranslationKey; keys?: string[][]; value?: TranslationKey }[] = [
+  { label: 'keys.playPause', keys: [['K']] },
+  { label: 'keys.seek', keys: [['J'], ['L']] },
+  { label: 'keys.frame', keys: [['Ctrl', ','], ['Ctrl', '.']] },
+  { label: 'keys.frameMulti', keys: [['Ctrl', 'Shift', ','], ['Ctrl', 'Shift', '.']] },
+  { label: 'keys.speed', keys: [['Ctrl', '['], ['Ctrl', ']']] },
+  { label: 'keys.speedReset', keys: [['Ctrl', '\\']] },
+  { label: 'keys.volume', keys: [['Ctrl', 'Shift', '↓'], ['Ctrl', 'Shift', '↑']] },
+  { label: 'keys.volumeReset', keys: [['Ctrl', 'Shift', '\\']] },
+  { label: 'keys.mute', keys: [['Ctrl', 'M']] },
+  { label: 'keys.loop', keys: [['Ctrl', 'Shift', 'L']] },
+  { label: 'keys.pip', keys: [['Ctrl', 'I']] },
+  { label: 'keys.screenshot', keys: [['Ctrl', 'Shift', 'F']] },
+  { label: 'keys.clip', keys: [['Ctrl', 'Shift', 'G']] },
+  { label: 'keys.wheel', value: 'keys.wheel.value' },
+];
+---
+
+<!--
+  Reference table of the default shortcuts. Sits on the plain page background
+  between the numbered features and the "Also included" band, so it needs no
+  BandEdges of its own: FeatureGrid's top edge already fades in below it.
+-->
+<section
+  id="shortcuts"
+  data-section="shortcuts"
+  aria-labelledby="keys-heading"
+  class="scroll-mt-19 px-6 pb-band"
+>
+  <div class="mx-auto max-w-compare">
+    <p class="text-center font-mono text-label font-medium tracking-eyebrow text-ink-faint uppercase">
+      {t('keys.eyebrow')}
+    </p>
+    <h2
+      id="keys-heading"
+      class="mx-auto mt-6 max-w-headline text-center text-h2 leading-heading tracking-heading text-balance"
+    >
+      {t('keys.title')}
+    </h2>
+    <p class="mx-auto mt-5 max-w-copy text-center text-body leading-body text-pretty text-ink-muted">
+      {t('keys.intro')}
+    </p>
+
+    <table class="mt-12 w-full border-collapse text-left">
+      <thead>
+        <tr class="border-b border-line">
+          <th scope="col" class="pb-4 font-mono text-label font-medium tracking-label text-ink-faint uppercase">
+            {t('keys.col.action')}
+          </th>
+          <th scope="col" class="pb-4 text-right font-mono text-label font-medium tracking-label text-ink-faint uppercase">
+            {t('keys.col.keys')}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr class="border-b border-line-compare">
+              <th scope="row" class="py-3.5 pr-4 text-sm font-normal text-ink-strong">
+                {t(row.label)}
+              </th>
+              <td class="py-3.5 text-right text-sm text-ink-muted">
+                {row.value ? (
+                  t(row.value)
+                ) : (
+                  <span class="inline-flex flex-wrap items-center justify-end gap-x-2 gap-y-1.5">
+                    {row.keys!.map((combo, i) => (
+                      <>
+                        {i > 0 && <span class="text-ink-faint" aria-hidden="true">/</span>}
+                        <kbd class="inline-flex items-center gap-1 font-mono">
+                          {combo.map((key, j) => (
+                            <>
+                              {j > 0 && <span class="text-ink-faint" aria-hidden="true">+</span>}
+                              <kbd class="min-w-6 rounded-btn border border-line-strong bg-fill-subtle px-1.5 py-0.5 text-center text-xs text-ink">
+                                {key}
+                              </kbd>
+                            </>
+                          ))}
+                        </kbd>
+                      </>
+                    ))}
+                  </span>
+                )}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+
+    <p class="mt-6 text-sm leading-row text-pretty text-ink-subtle">
+      {t('keys.note')}
+    </p>
+  </div>
+</section>

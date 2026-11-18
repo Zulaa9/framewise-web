@@ -38,6 +38,9 @@ const en = {
   'nav.skipToContent': 'Skip to content',
   'nav.home': 'Framewise — home',
   'nav.cta': 'Add to Chrome',
+  // Shown instead of the Chrome CTAs when the visitor is on Edge (see StoreLinks
+  // script in Layout.astro). Same store-agnostic meaning, different destination.
+  'nav.cta.edge': 'Add to Edge',
   'nav.language': 'Language',
   'nav.sections': 'Sections',
 
@@ -48,6 +51,7 @@ const en = {
   'section.problem': 'The problem',
   'section.features': 'Features',
   'section.included': 'Also included',
+  'section.shortcuts': 'Shortcuts',
   'section.cta': 'Get Framewise',
 
   // -- Hero -----------------------------------------------------------------
@@ -153,13 +157,57 @@ const en = {
   'grid.selection.title': 'Manual video selection',
   'grid.selection.body': 'Multiple videos on a page? Pick the one you mean.',
   'grid.detection.title': 'Robust HTML5 detection',
-  'grid.detection.body': 'Finds video players other extensions miss.',
+  'grid.detection.body':
+    'Finds players inside iframes, shadow DOM and single-page apps like YouTube.',
   'grid.persist.title': 'Per-site memory',
   'grid.persist.body':
     'Your last speed and volume settings, remembered per site.',
   'grid.privacy.title': 'Fully local',
   'grid.privacy.body':
     'Everything runs on-device — nothing is ever sent anywhere.',
+  'grid.audio.title': 'Audio players too',
+  'grid.audio.body':
+    'Podcasts, radio and audiobooks get speed, volume and j/k/l on pages with no video.',
+  'grid.recovery.title': 'Clip recovery',
+  'grid.recovery.body':
+    'Close or leave the tab mid-recording and the clip is still saved for you.',
+  'grid.layouts.title': 'Any keyboard layout',
+  'grid.layouts.body':
+    'One click switches to shortcuts that work where [ ] \\ need AltGr.',
+  'grid.seek.title': 'Quick seeks add up',
+  'grid.seek.body':
+    'Press l three times, jump three times — even while the video is still loading.',
+  'grid.loop.title': 'Stall-proof loop',
+  'grid.loop.body':
+    'Loop any video without the hangs a native loop can cause on streaming sites.',
+  'grid.pause.title': 'Pause per site',
+  'grid.pause.body':
+    "One click turns Framewise's shortcuts off on a site that already uses those keys.",
+
+  // -- Keyboard shortcuts ---------------------------------------------------
+  'keys.eyebrow': 'Keyboard shortcuts',
+  'keys.title': 'Every control, one key away.',
+  'keys.intro':
+    'The defaults below work out of the box. Change any of them in Options — globally or for a single site.',
+  'keys.col.action': 'Action',
+  'keys.col.keys': 'Shortcut',
+  'keys.playPause': 'Play / pause',
+  'keys.seek': 'Seek back / forward',
+  'keys.frame': 'Previous / next frame',
+  'keys.frameMulti': 'Jump several frames',
+  'keys.speed': 'Slower / faster',
+  'keys.speedReset': 'Normal speed',
+  'keys.volume': 'Volume down / up',
+  'keys.volumeReset': 'Volume to 100%',
+  'keys.mute': 'Mute',
+  'keys.loop': 'Loop',
+  'keys.pip': 'Picture-in-Picture',
+  'keys.screenshot': 'Capture frame',
+  'keys.clip': 'Record clip',
+  'keys.wheel': 'Change speed with the mouse',
+  'keys.wheel.value': 'Ctrl + wheel over the video',
+  'keys.note':
+    'On keyboards where [ ] and \\ need AltGr (Spanish, German, French…), Options offers alternatives in one click: Ctrl+Shift+← / → for speed.',
 
   // -- Use-case pills -------------------------------------------------------
   'pills.intro': "Wherever there's a video, there's a frame worth catching.",
@@ -179,6 +227,8 @@ const en = {
   'cta.title': 'Every frame, under your control.',
   'cta.button': 'Add to Chrome',
   'cta.meta': 'Also available for Edge',
+  'cta.button.edge': 'Add to Edge',
+  'cta.meta.edge': 'Also available for Chrome',
 
   // -- Footer ---------------------------------------------------------------
   'footer.copyright': '© Framewise — Unax Zulaika Fuente',
@@ -206,6 +256,7 @@ const es: Record<TranslationKey, string> = {
   'nav.skipToContent': 'Saltar al contenido',
   'nav.home': 'Framewise — inicio',
   'nav.cta': 'Añadir a Chrome',
+  'nav.cta.edge': 'Añadir a Edge',
   'nav.language': 'Idioma',
   'nav.sections': 'Secciones',
 
@@ -214,6 +265,7 @@ const es: Record<TranslationKey, string> = {
   'section.problem': 'El problema',
   'section.features': 'Funciones',
   'section.included': 'También incluido',
+  'section.shortcuts': 'Atajos',
   'section.cta': 'Consigue Framewise',
 
   // -- Hero -----------------------------------------------------------------
@@ -316,13 +368,56 @@ const es: Record<TranslationKey, string> = {
   'grid.selection.body': '¿Varios vídeos en una página? Elige el que quieres.',
   'grid.detection.title': 'Detección HTML5 robusta',
   'grid.detection.body':
-    'Encuentra reproductores que otras extensiones no ven.',
+    'Encuentra reproductores dentro de iframes, shadow DOM y webs de una sola página como YouTube.',
   'grid.persist.title': 'Memoria por sitio',
   'grid.persist.body':
     'Tu última velocidad y volumen, recordados para cada sitio.',
   'grid.privacy.title': 'Totalmente local',
   'grid.privacy.body':
     'Todo se ejecuta en tu dispositivo — nada sale nunca de él.',
+  'grid.audio.title': 'También audio',
+  'grid.audio.body':
+    'Podcasts, radio y audiolibros: velocidad, volumen y j/k/l en páginas sin vídeo.',
+  'grid.recovery.title': 'Recuperación de clips',
+  'grid.recovery.body':
+    'Si cierras o abandonas la pestaña a mitad de grabación, el clip se guarda igual.',
+  'grid.layouts.title': 'Cualquier teclado',
+  'grid.layouts.body':
+    'Con un clic, atajos que funcionan donde [ ] \\ necesitan AltGr.',
+  'grid.seek.title': 'Saltos que se suman',
+  'grid.seek.body':
+    'Pulsa l tres veces y salta tres veces, aunque el vídeo aún esté cargando.',
+  'grid.loop.title': 'Bucle sin cuelgues',
+  'grid.loop.body':
+    'Repite cualquier vídeo sin los bloqueos que un bucle nativo puede causar en streaming.',
+  'grid.pause.title': 'Pausa por sitio',
+  'grid.pause.body':
+    'Un clic desactiva los atajos de Framewise en un sitio que ya usa esas teclas.',
+
+  // -- Keyboard shortcuts ---------------------------------------------------
+  'keys.eyebrow': 'Atajos de teclado',
+  'keys.title': 'Cada control, a una tecla.',
+  'keys.intro':
+    'Estos son los atajos de serie. Puedes cambiar cualquiera en Opciones, para todos los sitios o solo para uno.',
+  'keys.col.action': 'Acción',
+  'keys.col.keys': 'Atajo',
+  'keys.playPause': 'Reproducir / pausar',
+  'keys.seek': 'Retroceder / avanzar',
+  'keys.frame': 'Fotograma anterior / siguiente',
+  'keys.frameMulti': 'Saltar varios fotogramas',
+  'keys.speed': 'Más lento / más rápido',
+  'keys.speedReset': 'Velocidad normal',
+  'keys.volume': 'Bajar / subir volumen',
+  'keys.volumeReset': 'Volumen al 100 %',
+  'keys.mute': 'Silenciar',
+  'keys.loop': 'Bucle',
+  'keys.pip': 'Picture-in-Picture',
+  'keys.screenshot': 'Capturar fotograma',
+  'keys.clip': 'Grabar clip',
+  'keys.wheel': 'Cambiar la velocidad con el ratón',
+  'keys.wheel.value': 'Ctrl + rueda sobre el vídeo',
+  'keys.note':
+    'En teclados donde [ ] y \\ necesitan AltGr (español, alemán, francés…), Opciones ofrece alternativas con un clic: Ctrl+Shift+← / → para la velocidad.',
 
   // -- Use-case pills -------------------------------------------------------
   'pills.intro':
@@ -343,6 +438,8 @@ const es: Record<TranslationKey, string> = {
   'cta.title': 'Cada fotograma, bajo tu control.',
   'cta.button': 'Añadir a Chrome',
   'cta.meta': 'También disponible para Edge',
+  'cta.button.edge': 'Añadir a Edge',
+  'cta.meta.edge': 'También disponible para Chrome',
 
   // -- Footer ---------------------------------------------------------------
   'footer.copyright': '© Framewise — Unax Zulaika Fuente',
