@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
-const lastUpdated = '2026-08-14';
+const lastUpdated = '2026-11-18';
 ---
 
 <Layout
@@ -46,7 +46,8 @@ const lastUpdated = '2026-08-14';
             an extension like this needs — Framewise has no way of knowing in advance which site
             you'll want frame-by-frame video control on, so it asks for the ability to look for a{' '}
             <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">&lt;video&gt;</code> element
-            on whatever page you're on. It only ever acts on that page's own video element, only
+            (or, on a page with no video at all, a podcast or radio <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">&lt;audio&gt;</code> player)
+            on whatever page you're on. It only ever acts on that page's own media element, only
             when you use a Framewise shortcut or the popup — it does not read page content, forms,
             passwords, browsing history, or anything else on the page.
           </p>
@@ -62,12 +63,33 @@ const lastUpdated = '2026-08-14';
         </section>
 
         <section>
+          <h2 class="text-lg font-medium text-ink">Recorded clips</h2>
+          <p class="mt-3">
+            When you record a clip, it's saved straight to your computer as a normal download.
+            While the recording is running, Framewise also keeps a temporary copy inside your
+            browser (in the extension's own IndexedDB storage, on your device only, together with
+            the address of the page it was recorded on, to label it), so the clip
+            isn't lost if the tab is closed or navigates away before you stop it. If that happens,
+            Framewise opens its own "Recovered clips" page to download it. The temporary copy is
+            deleted as soon as the recording ends normally; a recovered clip is removed a day after
+            it's downloaded, or after a week if it never is — and you can delete it yourself at any
+            time from that page. Clips never leave your device.
+          </p>
+          <p class="mt-3">
+            Framewise also keeps a short-lived list of which frame of each open tab contains a
+            video (in <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">chrome.storage.session</code>), so the popup can find players inside
+            embedded frames. It holds only tab and frame numbers, never page addresses or content,
+            and your browser clears it when it closes.
+          </p>
+        </section>
+
+        <section>
           <h2 class="text-lg font-medium text-ink">What Framewise never does</h2>
           <ul class="mt-3 flex flex-col gap-2 list-disc pl-5">
             <li>Never sends any data to any server — there isn't one.</li>
             <li>Never includes analytics, telemetry, or crash reporting of any kind.</li>
             <li>Never sells, shares, or transfers any data to any third party, because none is ever collected in the first place.</li>
-            <li>Never reads page content unrelated to the video element it controls (no forms, no passwords, no browsing history).</li>
+            <li>Never reads page content unrelated to the video or audio element it controls (no forms, no passwords, no browsing history).</li>
           </ul>
         </section>
 

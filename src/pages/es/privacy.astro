@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 
-const lastUpdated = '2026-08-14';
+const lastUpdated = '2026-11-18';
 ---
 
 <Layout
@@ -46,8 +46,9 @@ const lastUpdated = '2026-08-14';
             en todos los sitios web". Es el aviso estándar del permiso <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">host_permissions</code>{' '}
             que necesita una extensión así — Framewise no puede saber de antemano en qué sitio vas
             a querer control de vídeo fotograma a fotograma, así que pide poder buscar un elemento{' '}
-            <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">&lt;video&gt;</code> en
-            la página que sea. Solo actúa sobre el propio elemento de vídeo de esa página, y solo
+            <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">&lt;video&gt;</code> (o, en una página sin ningún vídeo, un reproductor
+            <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">&lt;audio&gt;</code> de pódcast o radio) en la página que sea. Solo actúa
+            sobre el propio elemento multimedia de esa página, y solo
             cuando usas un atajo de Framewise o el popup — no lee el contenido de la página,
             formularios, contraseñas, historial de navegación, ni nada más.
           </p>
@@ -63,12 +64,35 @@ const lastUpdated = '2026-08-14';
         </section>
 
         <section>
+          <h2 class="text-lg font-medium text-ink">Clips grabados</h2>
+          <p class="mt-3">
+            Cuando grabas un clip, se guarda directamente en tu ordenador como una descarga normal.
+            Mientras la grabación está en marcha, Framewise guarda además una copia temporal dentro
+            de tu navegador (en el almacenamiento IndexedDB propio de la extensión, solo en tu
+            dispositivo, junto con la dirección de la página donde se grabó, para identificarlo),
+            para que el clip no se pierda si la pestaña se cierra o cambia de página antes de que
+            la detengas. Si eso pasa, Framewise abre su propia página de "Clips recuperados" para
+            descargarlo. La copia temporal se borra en cuanto la grabación termina con normalidad;
+            un clip recuperado se elimina un día después de descargarlo, o al cabo de una semana si
+            no se descarga — y puedes borrarlo tú cuando quieras desde esa página. Los clips nunca
+            salen de tu dispositivo.
+          </p>
+          <p class="mt-3">
+            Framewise guarda también una lista temporal de qué marco (frame) de cada pestaña
+            abierta contiene un vídeo (en <code class="rounded-btn bg-fill-subtle px-1.5 py-0.5 text-xs">chrome.storage.session</code>), para que el
+            popup encuentre reproductores dentro de marcos incrustados. Solo contiene números de
+            pestaña y de marco, nunca direcciones ni contenido de las páginas, y el navegador la
+            borra al cerrarse.
+          </p>
+        </section>
+
+        <section>
           <h2 class="text-lg font-medium text-ink">Lo que Framewise nunca hace</h2>
           <ul class="mt-3 flex flex-col gap-2 list-disc pl-5">
             <li>Nunca manda ningún dato a ningún servidor — no existe ninguno.</li>
             <li>Nunca incluye analítica, telemetría, ni reporte de errores de ningún tipo.</li>
             <li>Nunca vende, comparte ni cede ningún dato a terceros, porque nunca se recoge ninguno para empezar.</li>
-            <li>Nunca lee contenido de la página ajeno al elemento de vídeo que controla (nada de formularios, contraseñas, ni historial de navegación).</li>
+            <li>Nunca lee contenido de la página ajeno al elemento de vídeo o audio que controla (nada de formularios, contraseñas, ni historial de navegación).</li>
           </ul>
         </section>
 
