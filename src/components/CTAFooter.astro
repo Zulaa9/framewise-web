@@ -37,6 +37,9 @@ const t = useTranslations(lang);
 
     <a
       href={links.chrome}
+      data-store-cta
+      data-edge-href={links.edge}
+      data-edge-label={t('cta.button.edge')}
       target="_blank"
       rel="noopener noreferrer"
       class="mt-12 inline-block rounded-cta bg-ink px-8 py-4 text-ui font-medium text-bg transition-opacity duration-200 hover:opacity-87"
@@ -47,6 +50,9 @@ const t = useTranslations(lang);
     <p class="mt-5 font-mono text-label text-ink-faint">
       <a
         href={links.edge}
+        data-store-alt
+        data-edge-href={links.chrome}
+        data-edge-label={t('cta.meta.edge')}
         target="_blank"
         rel="noopener noreferrer"
         class="underline decoration-line-strong underline-offset-2 transition-colors duration-200 hover:text-ink hover:decoration-ink"

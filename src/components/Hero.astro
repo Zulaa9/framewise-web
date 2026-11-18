@@ -58,6 +58,9 @@ const t = useTranslations(lang);
   <div class="mt-10 flex flex-wrap items-center justify-center gap-3 md:mt-12">
     <a
       href={links.chrome}
+      data-store-cta
+      data-edge-href={links.edge}
+      data-edge-label={t('nav.cta.edge')}
       target="_blank"
       rel="noopener noreferrer"
       class="rounded-cta bg-ink px-7 py-4 text-ui font-medium text-bg transition-opacity duration-200 hover:opacity-87"
@@ -77,6 +80,9 @@ const t = useTranslations(lang);
     <span aria-hidden="true"> · </span>
     <a
       href={links.edge}
+      data-store-alt
+      data-edge-href={links.chrome}
+      data-edge-label={t('cta.meta.edge')}
       target="_blank"
       rel="noopener noreferrer"
       class="underline decoration-line-strong underline-offset-2 transition-colors duration-200 hover:text-ink hover:decoration-ink"

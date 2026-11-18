@@ -21,7 +21,8 @@ const pageTitle = title ?? t('meta.title');
 const pageDescription = description ?? t('meta.description');
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL('/og.svg', Astro.site);
+// PNG, not SVG: Facebook, X, LinkedIn, Slack and WhatsApp don't render SVG share images.
+const ogImage = new URL(lang === 'es' ? '/og-es.png' : '/og.png', Astro.site);
 
 // One <link rel="alternate"> per locale, plus x-default pointing at English.
 const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
@@ -97,7 +98,11 @@ const esHref = showLangRedirect ? getRelativeLocaleUrl('es', route) : '';
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImage.href} />
     <meta property="og:image:alt" content={t('meta.ogAlt')} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage.href} />
 
     <slot name="head" />
   </head>
@@ -120,6 +125,25 @@ const esHref = showLangRedirect ? getRelativeLocaleUrl('es', route) : '';
       (layout from a just-swapped-in font, etc.) has also settled before smooth
       scrolling turns back on for whatever the visitor does next.
     -->
+    <!--
+      Visitors on Microsoft Edge get the Edge Add-ons listing as the primary
+      call to action (and "Also available for Chrome" as the secondary link)
+      instead of being sent to the Chrome Web Store. Server-rendered markup stays
+      Chrome-first, so without JS — or on any other browser — nothing changes.
+      Edge identifies itself with "Edg/" in its user agent.
+    -->
+    <script is:inline>
+      (function () {
+        if (!/\bEdg\//.test(navigator.userAgent)) return;
+        document.querySelectorAll('[data-store-cta], [data-store-alt]').forEach(function (a) {
+          var href = a.getAttribute('data-edge-href');
+          var label = a.getAttribute('data-edge-label');
+          if (href) a.setAttribute('href', href);
+          if (label) a.textContent = label;
+        });
+      })();
+    </script>
+
     <script is:inline>
       (function () {
         function enableSmoothScroll() {
