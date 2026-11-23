@@ -227,10 +227,10 @@ const en = {
   // -- Closing CTA ----------------------------------------------------------
   'cta.title': 'Every frame, under your control.',
   'cta.button': 'Add to Chrome',
-  'cta.meta': 'Also available for Edge',
+  'cta.alsoFor': 'Also available for',
+  'cta.and': 'and',
   'cta.button.edge': 'Add to Edge',
   'cta.button.firefox': 'Add to Firefox',
-  'cta.meta.edge': 'Also available for Chrome',
 
   // -- Footer ---------------------------------------------------------------
   'footer.copyright': '© Framewise — Unax Zulaika Fuente',
@@ -441,10 +441,10 @@ const es: Record<TranslationKey, string> = {
   // -- Closing CTA ----------------------------------------------------------
   'cta.title': 'Cada fotograma, bajo tu control.',
   'cta.button': 'Añadir a Chrome',
-  'cta.meta': 'También disponible para Edge',
+  'cta.alsoFor': 'También disponible para',
+  'cta.and': 'y',
   'cta.button.edge': 'Añadir a Edge',
   'cta.button.firefox': 'Añadir a Firefox',
-  'cta.meta.edge': 'También disponible para Chrome',
 
   // -- Footer ---------------------------------------------------------------
   'footer.copyright': '© Framewise — Unax Zulaika Fuente',
