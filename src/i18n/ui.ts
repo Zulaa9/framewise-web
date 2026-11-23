@@ -31,8 +31,8 @@ const en = {
   // -- Document / SEO -------------------------------------------------------
   'meta.title': 'Framewise — See every frame. Control every moment.',
   'meta.description':
-    'A Chrome and Edge extension for frame-by-frame video control: step one frame at a time, change playback speed, pop out a floating window, capture the current frame and boost volume past 100%.',
-  'meta.ogAlt': 'Framewise — frame-by-frame video control for Chrome and Edge',
+    'A Chrome, Edge and Firefox extension for frame-by-frame video control: step one frame at a time, change playback speed, pop out a floating window, capture the current frame and boost volume past 100%.',
+  'meta.ogAlt': 'Framewise — frame-by-frame video control for Chrome, Edge and Firefox',
 
   // -- Header ---------------------------------------------------------------
   'nav.skipToContent': 'Skip to content',
@@ -41,6 +41,7 @@ const en = {
   // Shown instead of the Chrome CTAs when the visitor is on Edge (see StoreLinks
   // script in Layout.astro). Same store-agnostic meaning, different destination.
   'nav.cta.edge': 'Add to Edge',
+  'nav.cta.firefox': 'Add to Firefox',
   'nav.language': 'Language',
   'nav.sections': 'Sections',
 
@@ -55,7 +56,7 @@ const en = {
   'section.cta': 'Get Framewise',
 
   // -- Hero -----------------------------------------------------------------
-  'hero.eyebrow': 'For Chrome & Edge',
+  'hero.eyebrow': 'For Chrome, Edge & Firefox',
   'hero.headline.line1': 'See every frame.',
   'hero.headline.line2': 'Control every moment.',
   'hero.subhead':
@@ -228,6 +229,7 @@ const en = {
   'cta.button': 'Add to Chrome',
   'cta.meta': 'Also available for Edge',
   'cta.button.edge': 'Add to Edge',
+  'cta.button.firefox': 'Add to Firefox',
   'cta.meta.edge': 'Also available for Chrome',
 
   // -- Footer ---------------------------------------------------------------
@@ -236,6 +238,7 @@ const en = {
   'footer.github': 'GitHub',
   'footer.chrome': 'Chrome Web Store',
   'footer.edge': 'Edge Add-ons',
+  'footer.firefox': 'Firefox Add-ons',
   'footer.privacy': 'Privacy policy',
 
   // -- Shared ---------------------------------------------------------------
@@ -248,15 +251,16 @@ const es: Record<TranslationKey, string> = {
   // -- Document / SEO -------------------------------------------------------
   'meta.title': 'Framewise — Ve cada fotograma. Controla cada momento.',
   'meta.description':
-    'Extensión para Chrome y Edge de control de vídeo fotograma a fotograma: avanza de uno en uno, cambia la velocidad, saca una ventana flotante, captura el fotograma actual y sube el volumen por encima del 100 %.',
+    'Extensión para Chrome, Edge y Firefox de control de vídeo fotograma a fotograma: avanza de uno en uno, cambia la velocidad, saca una ventana flotante, captura el fotograma actual y sube el volumen por encima del 100 %.',
   'meta.ogAlt':
-    'Framewise — control de vídeo fotograma a fotograma para Chrome y Edge',
+    'Framewise — control de vídeo fotograma a fotograma para Chrome, Edge y Firefox',
 
   // -- Header ---------------------------------------------------------------
   'nav.skipToContent': 'Saltar al contenido',
   'nav.home': 'Framewise — inicio',
   'nav.cta': 'Añadir a Chrome',
   'nav.cta.edge': 'Añadir a Edge',
+  'nav.cta.firefox': 'Añadir a Firefox',
   'nav.language': 'Idioma',
   'nav.sections': 'Secciones',
 
@@ -269,7 +273,7 @@ const es: Record<TranslationKey, string> = {
   'section.cta': 'Consigue Framewise',
 
   // -- Hero -----------------------------------------------------------------
-  'hero.eyebrow': 'Para Chrome y Edge',
+  'hero.eyebrow': 'Para Chrome, Edge y Firefox',
   'hero.headline.line1': 'Ve cada fotograma.',
   'hero.headline.line2': 'Controla cada momento.',
   'hero.subhead':
@@ -439,6 +443,7 @@ const es: Record<TranslationKey, string> = {
   'cta.button': 'Añadir a Chrome',
   'cta.meta': 'También disponible para Edge',
   'cta.button.edge': 'Añadir a Edge',
+  'cta.button.firefox': 'Añadir a Firefox',
   'cta.meta.edge': 'También disponible para Chrome',
 
   // -- Footer ---------------------------------------------------------------
@@ -447,6 +452,7 @@ const es: Record<TranslationKey, string> = {
   'footer.github': 'GitHub',
   'footer.chrome': 'Chrome Web Store',
   'footer.edge': 'Edge Add-ons',
+  'footer.firefox': 'Firefox Add-ons',
   'footer.privacy': 'Política de privacidad',
 
   // -- Shared ---------------------------------------------------------------
@@ -457,10 +463,12 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = { en, es };
 
 /**
  * External destinations. Not translated — same URLs in every locale.
- * Both listings are approved and live: Edge on 2026-08-14, Chrome shortly after.
+ * All listings are approved and live: Edge on 2026-08-14, Chrome shortly after, Firefox in 2026-11.
  */
 export const links = {
   chrome: 'https://chromewebstore.google.com/detail/framewise/mkpljcojmhhmkpamcdecnmjbndbabfae',
   edge: 'https://microsoftedge.microsoft.com/addons/detail/framewise/ppfmagbmfpeldadpbhbknlffhfnnhgee',
+  // AMO redirects to the visitor's language, so no locale in the path.
+  firefox: 'https://addons.mozilla.org/firefox/addon/framewise/',
   github: 'https://github.com/Zulaa9/framewise',
 } as const;
