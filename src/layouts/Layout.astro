@@ -22,7 +22,7 @@ const pageDescription = description ?? t('meta.description');
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // PNG, not SVG: Facebook, X, LinkedIn, Slack and WhatsApp don't render SVG share images.
-const ogImage = new URL(lang === 'es' ? '/og-es.png' : '/og.png', Astro.site);
+const ogImage = new URL(lang === 'es' ? '/og-es.png?v=2' : '/og.png?v=2', Astro.site);
 
 // One <link rel="alternate"> per locale, plus x-default pointing at English.
 const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
