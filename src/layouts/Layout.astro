@@ -127,17 +127,21 @@ const esHref = showLangRedirect ? getRelativeLocaleUrl('es', route) : '';
     -->
     <!--
       Visitors on Microsoft Edge get the Edge Add-ons listing as the primary
-      call to action (and "Also available for Chrome" as the secondary link)
-      instead of being sent to the Chrome Web Store. Server-rendered markup stays
-      Chrome-first, so without JS — or on any other browser — nothing changes.
-      Edge identifies itself with "Edg/" in its user agent.
+      call to action, and visitors on Firefox get Firefox Add-ons (both with
+      "Also available for Chrome" as the secondary link) instead of being sent
+      to the Chrome Web Store. Server-rendered markup stays Chrome-first, so
+      without JS — or on any other browser — nothing changes. Edge identifies
+      itself with "Edg/" in its user agent, Firefox with "Firefox/" (desktop)
+      or "FxiOS/" — iOS can't install extensions, so that one is left alone.
     -->
     <script is:inline>
       (function () {
-        if (!/\bEdg\//.test(navigator.userAgent)) return;
+        var ua = navigator.userAgent;
+        var store = /\bEdg\//.test(ua) ? 'edge' : /\bFirefox\//.test(ua) ? 'firefox' : null;
+        if (!store) return;
         document.querySelectorAll('[data-store-cta], [data-store-alt]').forEach(function (a) {
-          var href = a.getAttribute('data-edge-href');
-          var label = a.getAttribute('data-edge-label');
+          var href = a.getAttribute('data-' + store + '-href');
+          var label = a.getAttribute('data-' + store + '-label');
           if (href) a.setAttribute('href', href);
           if (label) a.textContent = label;
         });
