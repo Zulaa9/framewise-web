@@ -1,7 +1,7 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import '../styles/global.css';
-import { defaultLang, languages, type Lang } from '../i18n/ui';
+import { defaultLang, languages, links, type Lang } from '../i18n/ui';
 import { getLangFromUrl, getRouteFromUrl, useTranslations } from '../i18n/utils';
 
 interface Props {
@@ -40,6 +40,31 @@ const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
 // toggle, see LanguageToggle.astro) always wins over the live browser-language check, and persists
 // across visits — matching "once picked, it stays picked" on the extension side too.
 const showLangRedirect = lang === defaultLang;
+
+// Structured data (schema.org) so search engines can show Framewise as a free browser
+// extension with its store listings. Only facts we can stand behind: no ratings or user counts.
+const isHome = route === '' || route === '/';
+const jsonLd = isHome
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      '@id': 'https://framewise.zula.dev/#app',
+      name: 'Framewise',
+      description: pageDescription,
+      url: canonical.href,
+      image: new URL('/logo.png', Astro.site).href,
+      screenshot: ogImage.href,
+      inLanguage: lang,
+      applicationCategory: 'MultimediaApplication',
+      applicationSubCategory: 'Browser extension',
+      operatingSystem: 'Google Chrome, Microsoft Edge, Mozilla Firefox',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+      installUrl: [links.chrome, links.edge, links.firefox],
+      sameAs: [links.chrome, links.edge, links.firefox, links.github],
+      author: { '@type': 'Person', name: 'Zula', url: 'https://zula.dev/' },
+    })
+  : null;
 const esHref = showLangRedirect ? getRelativeLocaleUrl('es', route) : '';
 ---
 
@@ -103,6 +128,8 @@ const esHref = showLangRedirect ? getRelativeLocaleUrl('es', route) : '';
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={ogImage.href} />
+
+    {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
 
     <slot name="head" />
   </head>
